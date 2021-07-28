@@ -1,0 +1,17 @@
+{
+  "name": "@brightvision-team/payload-plugin-s3",
+  "version": "0.0.1",
+  "description": "Plugin for uploading media to S3 compatible APIs like DigitalOcean spaces and AWS S3.",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.23.0",
+    "payload": "^0.8.0"
+  }
+}
