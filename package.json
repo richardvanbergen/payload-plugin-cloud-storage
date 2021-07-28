@@ -1,13 +1,14 @@
 {
-  "name": "@brightvision-team/payload-plugin-s3",
+  "name": "payload-plugin-cloud-storage",
   "version": "0.0.1",
-  "description": "Plugin for uploading media to S3 compatible APIs like DigitalOcean spaces and AWS S3.",
+  "description": "Plugin for uploading media from collections to cloud storage. Currently only supports S3.",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc"
   },
   "devDependencies": {
+    "@types/express-fileupload": "^1.1.7",
     "typescript": "^4.3.5"
   },
   "dependencies": {
