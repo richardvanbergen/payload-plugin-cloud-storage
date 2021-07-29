@@ -1,17 +1,9 @@
 import { SanitizedConfig } from 'payload/config'
 import { UploadedFile } from 'express-fileupload'
-import { SanitizedCollectionConfig, CollectionBeforeChangeHook, CollectionAfterDeleteHook, Field } from 'payload/types'
+import { CollectionBeforeChangeHook, CollectionAfterDeleteHook } from 'payload/types'
+// @ts-ignore
 import { APIError } from 'payload/errors'
-import { AdapterInterface } from './payload-plugin-s3'
-
-
-function isUploadedFile (object: unknown): object is UploadedFile {
-  if (object !== null && typeof object === 'object') {
-    return 'mimetype' in object
-  }
-
-  return false
-}
+import { AdapterInterface, S3PluginCollectionModifiers } from './payload-plugin-s3'
 
 let adapterInstance: AdapterInterface
 const getAdapter = (): AdapterInterface => {
@@ -21,42 +13,49 @@ const getAdapter = (): AdapterInterface => {
   return adapterInstance
 }
 
-export const uploadHook: CollectionBeforeChangeHook = async ({ data, req }) => {
-  if (req?.files?.file) {
-    let uploadedFile: UploadedFile
-    if (isUploadedFile(req.files.file)) {
-      uploadedFile = req.files.file
-    } else {
-      uploadedFile = req.files.file[0]
+export const uploadHook: CollectionBeforeChangeHook = async (args) => {
+  if (args) {
+    const { req, data } = args
+    if (req?.files?.file) {
+      let uploadedFile: UploadedFile
+      if (Array.isArray(req.files.file)) {
+        uploadedFile = req.files.file[0]
+      } else {
+        uploadedFile = req.files.file
+      }
+
+      const adapter = getAdapter()
+      await adapter.upload(data.filename, uploadedFile)
     }
 
-    const adapter = getAdapter()
-    await adapter.upload(data.filename, uploadedFile)
+    return data
   }
-
-  return data
 }
 
-export const deleteHook: CollectionAfterDeleteHook = async ({ doc }) => {
-  const adapter = getAdapter()
-  await adapter.delete(doc.filename)
+export const deleteHook: CollectionAfterDeleteHook = async (args) => {
+  if (args) {
+    const { doc } = args
+    const adapter = getAdapter()
+    await adapter.delete(doc.filename)
+  }
 }
-
 
 const cloudStorage = (
   adapter: AdapterInterface,
-  aditionalFields: Field[]
+  uploadCollectionModifiers?: S3PluginCollectionModifiers
 ) => {
   adapterInstance = adapter
-
   return (incommingConfig: SanitizedConfig): SanitizedConfig => {
     const config: SanitizedConfig = {
       ...incommingConfig,
       collections: incommingConfig.collections.map(collection => {
         if (typeof collection.upload === 'object') {
-          collection.fields = [
-            ...collection.fields,
-          ]
+          if (Array.isArray(uploadCollectionModifiers?.fields) && uploadCollectionModifiers?.fields.length) {
+            collection.fields = [
+              ...collection.fields,
+              ...uploadCollectionModifiers.fields
+            ]
+          }
 
           const {
             beforeChange = [],
@@ -75,7 +74,9 @@ const cloudStorage = (
             ],
           }
 
-          collection.upload.adminThumbnail = ({ doc }: { doc: { cloudStorageUrl: string } }) => doc.cloudStorageUrl
+          if (uploadCollectionModifiers?.adminThumbnail) {
+            collection.upload.adminThumbnail = uploadCollectionModifiers.adminThumbnail
+          }
         }
 
         return collection
