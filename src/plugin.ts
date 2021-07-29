@@ -1,108 +1,77 @@
 import { SanitizedConfig } from 'payload/config'
 import { UploadedFile } from 'express-fileupload'
-import { SanitizedCollectionConfig, CollectionBeforeChangeHook, CollectionAfterDeleteHook } from 'payload/types'
-import { APIError } from 'payload/errors'
-import { AdapterInterface } from './payload-plugin-s3'
+import { CollectionBeforeChangeHook, CollectionAfterDeleteHook } from 'payload/types'
+import { AdapterInterface, S3PluginCollectionModifiers } from './payload-plugin-s3'
 
-function isUploadedFile (object: unknown): object is UploadedFile {
-  if (object !== null && typeof object === 'object') {
-    return 'mimetype' in object
-  }
+export const uploadHook = (adapter: AdapterInterface) => {
+  const beforeChange: CollectionBeforeChangeHook = async (args) => {
+    if (args) {
+      const { req, data } = args
+      if (req?.files?.file) {
+        let uploadedFile: UploadedFile
+        if (Array.isArray(req.files.file)) {
+          uploadedFile = req.files.file[0]
+        } else {
+          uploadedFile = req.files.file
+        }
 
-  return false
-}
+        await adapter.upload(data.filename, uploadedFile)
+      }
 
-let adapterInstance: AdapterInterface
-const getAdapter = (): AdapterInterface => {
-  if (!adapterInstance) {
-    throw new APIError("Adapter has not been initialized.")
-  }
-  return adapterInstance
-}
-
-export const uploadHook: CollectionBeforeChangeHook = async ({ data, req }) => {
-  if (req?.files?.file) {
-    let uploadedFile: UploadedFile
-    if (isUploadedFile(req.files.file)) {
-      uploadedFile = req.files.file
-    } else {
-      uploadedFile = req.files.file[0]
+      return data
     }
-
-    const adapter = getAdapter()
-    await adapter.upload(data.filename, uploadedFile)
   }
 
-  return data
+  return beforeChange
 }
 
-export const deleteHook: CollectionAfterDeleteHook = async ({ doc }) => {
-  const adapter = getAdapter()
-  await adapter.delete(doc.filename)
-}
-
-export function withCloudStorage (
-  collection: SanitizedCollectionConfig,
-  adapter: AdapterInterface,
-  getUrl: (filename: string) => string,
-): SanitizedCollectionConfig {
-  adapterInstance = adapter
-
-  collection.fields = [
-    ...collection.fields,
-    {
-      label: 'Cloud Storage URL',
-      name: 'cloudStorageUrl',
-      type: 'text',
-      admin: {
-        readOnly: true,
-      },
-      hooks: {
-        beforeChange: [
-          (): undefined => undefined,
-        ],
-        afterRead: [
-          ({ data }): string => {
-            return getUrl(String(data.filename))
-          },
-        ],
-      },
-    },
-  ]
-
-  const {
-    beforeChange = [],
-    afterDelete = [],
-  } = collection.hooks || {}
-
-  collection.hooks = {
-    ...collection.hooks,
-    beforeChange: [
-      ...beforeChange,
-      uploadHook,
-    ],
-    afterDelete: [
-      ...afterDelete,
-      deleteHook,
-    ],
+export const deleteHook = (adapter: AdapterInterface) => {
+  const afterDelete: CollectionAfterDeleteHook = async (args) => {
+    if (args) {
+      const { doc } = args
+      await adapter.delete(doc.filename)
+    }
   }
 
-  collection.upload.adminThumbnail = ({ doc }: { doc: { cloudStorageUrl: string } }) => doc.cloudStorageUrl
-
-  return collection
+  return afterDelete
 }
-
 
 const cloudStorage = (
   adapter: AdapterInterface,
-  getUrl: (filename: string) => string,
+  uploadCollectionModifiers?: S3PluginCollectionModifiers
 ) => {
   return (incommingConfig: SanitizedConfig): SanitizedConfig => {
     const config: SanitizedConfig = {
       ...incommingConfig,
       collections: incommingConfig.collections.map(collection => {
         if (typeof collection.upload === 'object') {
-          return withCloudStorage(collection, adapter, getUrl)
+          if (Array.isArray(uploadCollectionModifiers?.fields) && uploadCollectionModifiers?.fields.length) {
+            collection.fields = [
+              ...collection.fields,
+              ...uploadCollectionModifiers.fields
+            ]
+          }
+
+          const {
+            beforeChange = [],
+            afterDelete = [],
+          } = collection.hooks || {}
+
+          collection.hooks = {
+            ...collection.hooks,
+            beforeChange: [
+              ...beforeChange,
+              uploadHook(adapter),
+            ],
+            afterDelete: [
+              ...afterDelete,
+              deleteHook(adapter),
+            ],
+          }
+
+          if (uploadCollectionModifiers?.adminThumbnail && typeof collection?.upload?.adminThumbnail === 'undefined') {
+            collection.upload.adminThumbnail = uploadCollectionModifiers.adminThumbnail
+          }
         }
 
         return collection

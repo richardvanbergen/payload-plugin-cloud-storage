@@ -5,10 +5,15 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest"
   },
   "devDependencies": {
     "@types/express-fileupload": "^1.1.7",
+    "@types/jest": "^26.0.24",
+    "jest": "^27.0.6",
+    "jest-mock-extended": "^1.0.18",
+    "ts-jest": "^27.0.4",
     "typescript": "^4.3.5"
   },
   "dependencies": {
