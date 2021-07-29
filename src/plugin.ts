@@ -74,7 +74,7 @@ const cloudStorage = (
             ],
           }
 
-          if (uploadCollectionModifiers?.adminThumbnail) {
+          if (uploadCollectionModifiers?.adminThumbnail && typeof collection?.upload?.adminThumbnail === 'undefined') {
             collection.upload.adminThumbnail = uploadCollectionModifiers.adminThumbnail
           }
         }

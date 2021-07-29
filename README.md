@@ -65,7 +65,9 @@ export const cloudStorageFields: Field[] = [
 ]
 
 /**
- * Finally you can also specify how to fetch the admin URL using the same signature as if you would for other colections
+ * Finally you can also specify how to fetch the admin URL using the same signature as if you would for other colections.
+ * 
+ * This does not override any exising `upload.adminThumbnail` on your collection.
  */
 const adminThumbnail: GetAdminThumbnail = (args) => {
   if (typeof args?.doc?.cloudStorageUrl === 'string') {
