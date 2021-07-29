@@ -1,5 +1,5 @@
 import { AdapterInterface } from './payload-plugin-s3'
-import { deleteHook, uploadHook } from './plugin'
+import cloudStorage, { deleteHook, uploadHook } from './plugin'
 import { mock as mockInterface } from 'jest-mock-extended'
 import { UploadedFile } from 'express-fileupload'
 
@@ -69,5 +69,116 @@ describe('main plugin', () => {
 
     expect(adapter.upload).toBeCalledWith('filename.image', testFile2)
     expect(adapter.upload).toBeCalledTimes(1)
+  })
+
+  it('attaches hooks to upload collections', () => {
+    const cs = cloudStorage(adapter)
+    // @ts-ignore
+    const initialized = cs({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: {},
+        },
+        // @ts-ignore
+        {
+          slug: 'image2',
+        }
+      ]
+    })
+    
+    expect(initialized?.collections[0]?.hooks?.beforeChange).toHaveLength(1)
+    expect(initialized?.collections[0]?.hooks?.afterDelete).toHaveLength(1)
+    
+    expect(initialized?.collections[1]?.hooks?.beforeChange).toBeUndefined()
+    expect(initialized?.collections[1]?.hooks?.afterDelete).toBeUndefined()
+  })
+
+  it('appends fields to uploadCollectionModifiers', () => {
+    const cs = cloudStorage(adapter, {
+      fields: [
+        {
+          name: 'extra field',
+          type: 'text',
+        }
+      ]
+    })
+
+    // @ts-ignore
+    const initialized = cs(
+      {
+        collections: [
+          // @ts-ignore
+          {
+            slug: 'image',
+            // @ts-ignore
+            upload: {},
+            fields: [
+              // @ts-ignore
+              {
+                name: 'test'
+              }
+            ]
+          },
+        ]
+      }
+    )
+    
+    expect(initialized?.collections[0]?.fields[1]?.name).toBe('extra field')
+  })
+
+  it('sets the adminThumbnail', () => {
+    const cs = cloudStorage(adapter, {
+      adminThumbnail: () => 'set via cs'
+    })
+
+    // @ts-ignore
+    const initialized = cs(
+      {
+        collections: [
+          // @ts-ignore
+          {
+            slug: 'image',
+            // @ts-ignore
+            upload: {
+            },
+            fields: [
+            ]
+          },
+        ]
+      }
+    )
+    
+    // @ts-ignore
+    expect(initialized?.collections[0]?.upload?.adminThumbnail()).toBe('set via cs')
+  })
+
+  it('does not override exisint adminThumbnails', () => {
+    const cs = cloudStorage(adapter, {
+      adminThumbnail: () => 'set via cs'
+    })
+
+    // @ts-ignore
+    const initialized = cs(
+      {
+        collections: [
+          // @ts-ignore
+          {
+            slug: 'image',
+            // @ts-ignore
+            upload: {
+              adminThumbnail: () => 'set via collection'
+            },
+            fields: [
+            ]
+          },
+        ]
+      }
+    )
+    
+    // @ts-ignore
+    expect(initialized?.collections[0]?.upload?.adminThumbnail()).toBe('set via collection')
   })
 })
