@@ -8,6 +8,6 @@ export interface AdapterInterface {
 }
 
 export type S3PluginCollectionModifiers = {
-  fields: Field[],
-  adminThumbnail: string | GetAdminThumbnail | undefined
+  fields?: Field[],
+  adminThumbnail?: string | GetAdminThumbnail | undefined
 }
