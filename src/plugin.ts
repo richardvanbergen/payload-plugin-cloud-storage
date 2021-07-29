@@ -1,8 +1,9 @@
 import { SanitizedConfig } from 'payload/config'
 import { UploadedFile } from 'express-fileupload'
-import { SanitizedCollectionConfig, CollectionBeforeChangeHook, CollectionAfterDeleteHook } from 'payload/types'
+import { SanitizedCollectionConfig, CollectionBeforeChangeHook, CollectionAfterDeleteHook, Field } from 'payload/types'
 import { APIError } from 'payload/errors'
 import { AdapterInterface } from './payload-plugin-s3'
+
 
 function isUploadedFile (object: unknown): object is UploadedFile {
   if (object !== null && typeof object === 'object') {
@@ -41,68 +42,40 @@ export const deleteHook: CollectionAfterDeleteHook = async ({ doc }) => {
   await adapter.delete(doc.filename)
 }
 
-export function withCloudStorage (
-  collection: SanitizedCollectionConfig,
-  adapter: AdapterInterface,
-  getUrl: (filename: string) => string,
-): SanitizedCollectionConfig {
-  adapterInstance = adapter
-
-  collection.fields = [
-    ...collection.fields,
-    {
-      label: 'Cloud Storage URL',
-      name: 'cloudStorageUrl',
-      type: 'text',
-      admin: {
-        readOnly: true,
-      },
-      hooks: {
-        beforeChange: [
-          (): undefined => undefined,
-        ],
-        afterRead: [
-          ({ data }): string => {
-            return getUrl(String(data.filename))
-          },
-        ],
-      },
-    },
-  ]
-
-  const {
-    beforeChange = [],
-    afterDelete = [],
-  } = collection.hooks || {}
-
-  collection.hooks = {
-    ...collection.hooks,
-    beforeChange: [
-      ...beforeChange,
-      uploadHook,
-    ],
-    afterDelete: [
-      ...afterDelete,
-      deleteHook,
-    ],
-  }
-
-  collection.upload.adminThumbnail = ({ doc }: { doc: { cloudStorageUrl: string } }) => doc.cloudStorageUrl
-
-  return collection
-}
-
 
 const cloudStorage = (
   adapter: AdapterInterface,
-  getUrl: (filename: string) => string,
+  aditionalFields: Field[]
 ) => {
+  adapterInstance = adapter
+
   return (incommingConfig: SanitizedConfig): SanitizedConfig => {
     const config: SanitizedConfig = {
       ...incommingConfig,
       collections: incommingConfig.collections.map(collection => {
         if (typeof collection.upload === 'object') {
-          return withCloudStorage(collection, adapter, getUrl)
+          collection.fields = [
+            ...collection.fields,
+          ]
+
+          const {
+            beforeChange = [],
+            afterDelete = [],
+          } = collection.hooks || {}
+
+          collection.hooks = {
+            ...collection.hooks,
+            beforeChange: [
+              ...beforeChange,
+              uploadHook,
+            ],
+            afterDelete: [
+              ...afterDelete,
+              deleteHook,
+            ],
+          }
+
+          collection.upload.adminThumbnail = ({ doc }: { doc: { cloudStorageUrl: string } }) => doc.cloudStorageUrl
         }
 
         return collection
