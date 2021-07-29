@@ -63,13 +63,26 @@ export const cloudStorageFields: Field[] = [
     },
   },
 ]
+
+/**
+ * Finally you can also specify how to fetch the admin URL using the same signature as if you would for other colections
+ */
+const adminThumbnail: GetAdminThumbnail = (args) => {
+  if (typeof args?.doc?.cloudStorageUrl === 'string') {
+    return args?.doc?.cloudStorageUrl
+  }
+
+  // or handle missing image some other way
+  return ''
+}
+
 ```
 
 ```ts
 // src/payload.config.ts
 import { buildConfig } from 'payload/config';
 import cloudStorage from 'payload-plugin-cloud-storage'
-import { s3Adapater, cloudStorageFields } from './plugins/cloudStorage.ts'
+import { s3Adapater, cloudStorageFields, adminThumbnail } from './plugins/cloudStorage.ts'
 
 const config = buildConfig({
   serverURL: 'http://localhost:3000',
@@ -77,12 +90,16 @@ const config = buildConfig({
     {
       slug: 'images',
       upload: true, // uploads being enabled is what enables this plugin on the collection
+      fields: []
     }
   ],
   plugins: [
     cloudStorage(
       s3Adapater,
-      cloudStorageFields
+      {
+        fields: cloudStorageFields,
+        adminThumbnail: adminThumbnail
+      }
     ),
   ]
 });
