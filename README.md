@@ -1,5 +1,15 @@
 # payload-plugin-cloud-storage
 
+## todo
+
+- [] Tidy up documention
+- [] Publish to NPM
+- [] Create workflow for publishing to NPM
+- [] Add support for upload `sizes`
+- [] Add cloudinary support (?)
+- [] Test in situation
+- [] Add option for disabling local storage
+
 docs coming soon, just looking for feedback right now, I promise it'll be shiny
 
 the idea of this plugin is to implement a simple cloud storage plugin that allows the user to upload thier collections with `upload` to any major cloud storage provider
