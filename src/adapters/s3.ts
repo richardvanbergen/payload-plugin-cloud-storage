@@ -8,8 +8,8 @@ export type FileOptions = {
 }
 
 export class S3Adapter implements AdapterInterface {
-  instance: AWS.S3 = null
-  options: FileOptions = null
+  instance: AWS.S3
+  options: FileOptions
 
   constructor(s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions) {
     this.instance = new AWS.S3(s3Configuration)
