@@ -1,5 +1,7 @@
 # payload-plugin-cloud-storage
 
+**DISCLAIMER: While I welcome early feedback, this library is still in development and I haven't even done any real-world integration testing yet. As you can probably tell by the TODOs and the poorly written documentation bellow, use at your own risk. It's only published so I can test the release and publish mechanisms. :)**
+
 ## todo
 
 - [ ] Tidy up documention
