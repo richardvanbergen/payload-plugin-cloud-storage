@@ -23,7 +23,8 @@ this hasn't been tested yet, I'm just looking for feedback on the usage pattern
 ```ts
 // src/plugins/cloudStorage.ts
 import { Field } from 'payload/types'
-import { S3Adapter } from 'payload-plugin-cloud-storage/adapters/s3';
+import { GetAdminThumbnail } from 'payload/dist/uploads/types'
+import { S3Adapter } from 'payload-plugin-cloud-storage';
 
 /**
  * `S3Adapter` is simply a class that implements `AdapterInterface` this
