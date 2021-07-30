@@ -1,6 +1,6 @@
 {
   "name": "payload-plugin-cloud-storage",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Plugin for uploading media from collections to cloud storage. Currently only supports S3.",
   "main": "dist/index.js",
   "license": "MIT",
