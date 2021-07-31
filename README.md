@@ -5,11 +5,11 @@
 ## todo
 
 - [ ] Tidy up documention
-- [ ] Publish to NPM
-- [ ] Create workflow for publishing to NPM
+- [x] Publish to NPM
+- [x] Create workflow for publishing to NPM
 - [ ] Add support for upload `sizes`
 - [ ] Add cloudinary support (?)
-- [ ] Test in situation
+- [x] Test in situation
 - [ ] Add option for disabling local storage
 - [ ] Update payload version and add new types
 
