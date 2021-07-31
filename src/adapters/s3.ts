@@ -1,6 +1,6 @@
 import * as AWS from '@aws-sdk/client-s3'
 import { UploadedFile } from 'express-fileupload';
-import { AdapterInterface } from "../payload-plugin-s3";
+import { AdapterInterface } from '../plugin';
 
 export type FileOptions = {
   bucket: string;
