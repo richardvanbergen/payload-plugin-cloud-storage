@@ -1,47 +1,29 @@
-import { SanitizedConfig } from 'payload/config'
+import { Config } from 'payload/config'
 import { UploadedFile } from 'express-fileupload'
-import { CollectionBeforeChangeHook, CollectionAfterDeleteHook } from 'payload/types'
-import { AdapterInterface, S3PluginCollectionModifiers } from './payload-plugin-s3'
-
-export const uploadHook = (adapter: AdapterInterface) => {
-  const beforeChange: CollectionBeforeChangeHook = async (args) => {
-    if (args) {
-      const { req, data } = args
-      if (req?.files?.file) {
-        let uploadedFile: UploadedFile
-        if (Array.isArray(req.files.file)) {
-          uploadedFile = req.files.file[0]
-        } else {
-          uploadedFile = req.files.file
-        }
-
-        await adapter.upload(data.filename, uploadedFile)
-      }
-
-      return data
-    }
-  }
-
-  return beforeChange
+import { Field } from 'payload/types'
+import { GetAdminThumbnail } from 'payload/dist/uploads/types'
+import uploadHook from './hooks/uploadHook'
+import deleteHook from './hooks/deleteHook'
+export interface AdapterInterface {
+  upload(filename: string, file: UploadedFile): Promise<void>;
+  delete(filename: string): Promise<void>;
 }
 
-export const deleteHook = (adapter: AdapterInterface) => {
-  const afterDelete: CollectionAfterDeleteHook = async (args) => {
-    if (args) {
-      const { doc } = args
-      await adapter.delete(doc.filename)
-    }
-  }
-
-  return afterDelete
+export type S3PluginCollectionModifiers = {
+  fields?: Field[],
+  adminThumbnail?: string | GetAdminThumbnail | undefined
 }
 
 const cloudStorage = (
   adapter: AdapterInterface,
   uploadCollectionModifiers?: S3PluginCollectionModifiers
 ) => {
-  return (incommingConfig: SanitizedConfig): SanitizedConfig => {
-    const config: SanitizedConfig = {
+  return (incommingConfig: Config): Config => {
+    if (!incommingConfig.collections) {
+      return incommingConfig
+    }
+
+    const config: Config = {
       ...incommingConfig,
       collections: incommingConfig.collections.map(collection => {
         if (typeof collection.upload === 'object') {
