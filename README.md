@@ -12,6 +12,7 @@
 - [x] Test in situation
 - [ ] Add option for disabling local storage
 - [ ] Update payload version and add new types
+- [ ] Add build/coverage/version badges
 
 docs coming soon, just looking for feedback right now, I promise it'll be shiny
 
