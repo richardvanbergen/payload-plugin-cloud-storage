@@ -9,14 +9,14 @@ export interface AdapterInterface {
   delete(filename: string): Promise<void>;
 }
 
-export type S3PluginCollectionModifiers = {
+export type CloudStorageCollectionModifiers = {
   fields?: Field[],
   adminThumbnail?: string | GetAdminThumbnail | undefined
 }
 
 const cloudStorage = (
   adapter: AdapterInterface,
-  uploadCollectionModifiers?: S3PluginCollectionModifiers
+  uploadCollectionModifiers?: CloudStorageCollectionModifiers
 ) => {
   return (incommingConfig: Config): Config => {
     if (!incommingConfig.collections) {
