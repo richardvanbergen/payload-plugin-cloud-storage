@@ -1,5 +1,4 @@
 import { Config } from 'payload/config'
-import { UploadedFile } from 'express-fileupload'
 import { Field } from 'payload/types'
 import { GetAdminThumbnail } from 'payload/dist/uploads/types'
 import uploadHook from './hooks/uploadHook'
@@ -46,6 +45,9 @@ const cloudStorage = (
               ...afterDelete,
               deleteHook(adapter),
             ],
+            afterRead: [
+              ()
+            ]
           }
 
           if (uploadCollectionModifiers?.adminThumbnail && typeof collection?.upload?.adminThumbnail === 'undefined') {

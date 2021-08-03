@@ -33,6 +33,8 @@ First, instantiate an adapter. Currently we only support S3 but this will change
 #### S3 (AWS and Digital Ocean)
 
 ```ts
+import { S3Adapter } from 'payload-plugin-cloud-storage';
+
 const s3Adapater = new S3Adapter(
   {
     endpoint: `https://${process.env.SPACES_REGION}.digitaloceanspaces.com`,
@@ -44,9 +46,10 @@ const s3Adapater = new S3Adapter(
   },
   {
     bucket: process.env.SPACES_NAME,
+    endpointUrL: `https://${process.env.SPACES_NAME}.${process.env.SPACES_REGION}.cdn.digitaloceanspaces.com`
   },
-  (endpoint, file) => {
-    return `https://${process.env.SPACES_NAME}.${process.env.SPACES_REGION}.cdn.digitaloceanspaces.com/${data.filename}`
+  (endpointUrL, file) => {
+    return `${endpoint}/${data.filename}`
   }
 )
 ```
@@ -90,6 +93,9 @@ const config = buildConfig({
 Following from the Basic Usage example above.
 
 ```ts
+import { Field } from 'payload/types'
+import { GetAdminThumbnail } from 'payload/dist/uploads/types'
+
 /**
  * uploadCollectionModifiers.fields
  */
