@@ -1,7 +1,9 @@
-import { AdapterInterface } from './payload-plugin-s3'
-import cloudStorage, { deleteHook, uploadHook } from './plugin'
+import cloudStorage from './plugin'
 import { mock as mockInterface } from 'jest-mock-extended'
 import { UploadedFile } from 'express-fileupload'
+import deleteHook from './hooks/deleteHook'
+import uploadHook from './hooks/uploadHook'
+import { AdapterInterface } from './adapter'
 
 describe('main plugin', () => {
   let adapter: AdapterInterface
@@ -15,6 +17,7 @@ describe('main plugin', () => {
 
   it('can make a hook that calls adapters delete method', () => {
     const initializedHook = deleteHook(adapter)
+    // @ts-ignore
     initializedHook({ doc: { filename: 'test.jpg' } })
     expect(adapter.delete).toBeCalledTimes(1)
   })
@@ -33,6 +36,7 @@ describe('main plugin', () => {
 
     initializedHook({
       data,
+    // @ts-ignore
       req
     })
 
@@ -61,6 +65,7 @@ describe('main plugin', () => {
 
     initializedHook({
       data,
+      // @ts-ignore
       req
     })
 
@@ -131,8 +136,8 @@ describe('main plugin', () => {
       adminThumbnail: () => 'set via cs'
     })
 
-    // @ts-ignore
     const initialized = cs(
+      // @ts-ignore
       {
         collections: [
           // @ts-ignore
@@ -157,8 +162,8 @@ describe('main plugin', () => {
       adminThumbnail: () => 'set via cs'
     })
 
-    // @ts-ignore
     const initialized = cs(
+      // @ts-ignore
       {
         collections: [
           // @ts-ignore
