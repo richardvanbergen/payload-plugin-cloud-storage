@@ -45,9 +45,6 @@ const cloudStorage = (
               ...afterDelete,
               deleteHook(adapter),
             ],
-            afterRead: [
-              ()
-            ]
           }
 
           if (uploadCollectionModifiers?.adminThumbnail && typeof collection?.upload?.adminThumbnail === 'undefined') {

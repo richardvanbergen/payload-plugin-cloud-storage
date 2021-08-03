@@ -79,14 +79,22 @@ const config = buildConfig({
 })
 ```
 
+By default, the virtual field that is added is named `cloudStorageUrl` and it has an `afterRead` that returns an full URL to the file.
+
+The URL returned is determined by the adapter you're using in its implementation of `AdapterInterface.getEndpointUrl`.
+
+| Adapter   | Template                     | Description                                                                                                                                      |
+|-----------|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| S3Adapter | {{endpointUrl}}/{{filename}} | `endpointUrl` is determined by `options.endpointUrl` and filename is returned by payloads `afterRead` field hook in the form of `data.filename`. |
+
 ## Advanced Options
 
 `cloudStorage` allows you to pass a second `uploadCollectionModifiers` parameter which allows you to fully modify the default behavior.
 
-| Property       | Required | values                     | Description                                                                                                                                                                                                                                                                                                                                    |   |
-|----------------|----------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|
-| fields         | no       | Field[] \| false           | If an array of payload `Field`, then this will replace the default virtual configuration fields that get added to the collection.<br><br> Passing `false` will disable the virtual fields and not provide a replacement.                                                                                                                              |   |
-| adminThumbnail | no       | GetAdminThumbnail \| false | Passing a payload `GetAdminThumbnail` compatible function will override the default method we use to fetch the admin thumbnail.<br><br>  Passing `false` will disable it entirely.<br><br>  Note: This function will not be override any [upload.adminThumbnail]() methods specified directly on the collection. It'll only apply if it doesn't already exist. |   |
+| Property       | Required | values                     | Description                                                                                                                                                                                                                                                                                                                                                    |
+|----------------|----------|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| fields         | no       | Field[] \| false           | If an array of payload `Field`, then this will replace the default virtual configuration fields that get added to the collection.<br><br>  Passing `false` will disable the virtual fields and not provide a replacement.                                                                                                                                      |
+| adminThumbnail | no       | GetAdminThumbnail \| false | Passing a payload `GetAdminThumbnail` compatible function will override the default method we use to fetch the admin thumbnail.<br><br>  Passing `false` will disable it entriely.<br><br>  Note: This function will not be override any [upload.adminThumbnail]() methods specified directly on the collection. It'll only apply if it doesn't already exist. |
 
 **Example**
 
