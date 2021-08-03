@@ -4,10 +4,7 @@ import { Field } from 'payload/types'
 import { GetAdminThumbnail } from 'payload/dist/uploads/types'
 import uploadHook from './hooks/uploadHook'
 import deleteHook from './hooks/deleteHook'
-export interface AdapterInterface {
-  upload(filename: string, file: UploadedFile): Promise<void>;
-  delete(filename: string): Promise<void>;
-}
+import { AdapterInterface } from './adapter'
 
 export type CloudStorageCollectionModifiers = {
   fields?: Field[],
