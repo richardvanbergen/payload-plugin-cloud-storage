@@ -4,10 +4,11 @@ import { GetAdminThumbnail } from 'payload/dist/uploads/types'
 import uploadHook from './hooks/uploadHook'
 import deleteHook from './hooks/deleteHook'
 import { AdapterInterface } from './adapter'
+import getCloudStorageUrlField from './fields/cloudStorageUrl'
 
 export type CloudStorageCollectionModifiers = {
-  fields?: Field[],
-  adminThumbnail?: string | GetAdminThumbnail | undefined
+  fields?: Field[] | false | undefined,
+  adminThumbnail?: string | GetAdminThumbnail | false | undefined
 }
 
 const cloudStorage = (
@@ -19,6 +20,11 @@ const cloudStorage = (
       return incommingConfig
     }
 
+    let additionalFields: Field[] = []
+    if (uploadCollectionModifiers?.fields !== false) {
+      additionalFields = uploadCollectionModifiers?.fields ?? [getCloudStorageUrlField(adapter)]
+    }
+
     const config: Config = {
       ...incommingConfig,
       collections: incommingConfig.collections.map(collection => {
@@ -26,7 +32,7 @@ const cloudStorage = (
           if (Array.isArray(uploadCollectionModifiers?.fields) && uploadCollectionModifiers?.fields.length) {
             collection.fields = [
               ...collection.fields,
-              ...uploadCollectionModifiers.fields
+              ...additionalFields
             ]
           }
 

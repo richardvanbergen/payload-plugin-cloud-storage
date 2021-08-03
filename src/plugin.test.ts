@@ -162,7 +162,7 @@ describe('main plugin', () => {
     expect(initialized?.collections[0]?.upload?.adminThumbnail()).toBe('set via cs')
   })
 
-  it('does not override exisint adminThumbnails', () => {
+  it('does not override existing adminThumbnails', () => {
     const cs = cloudStorage(adapter, {
       adminThumbnail: () => 'set via cs'
     })
