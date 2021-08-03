@@ -91,10 +91,14 @@ describe('main plugin', () => {
       ]
     })
     
+    // @ts-ignore
     expect(initialized?.collections[0]?.hooks?.beforeChange).toHaveLength(1)
+    // @ts-ignore
     expect(initialized?.collections[0]?.hooks?.afterDelete).toHaveLength(1)
     
+    // @ts-ignore
     expect(initialized?.collections[1]?.hooks?.beforeChange).toBeUndefined()
+    // @ts-ignore
     expect(initialized?.collections[1]?.hooks?.afterDelete).toBeUndefined()
   })
 
@@ -128,6 +132,7 @@ describe('main plugin', () => {
       }
     )
     
+    // @ts-ignores
     expect(initialized?.collections[0]?.fields[1]?.name).toBe('extra field')
   })
 
