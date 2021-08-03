@@ -15,7 +15,6 @@ describe('main plugin', () => {
 
   it('can make a hook that calls adapters delete method', () => {
     const initializedHook = deleteHook(adapter)
-    // @ts-expect-error don't need to mock out entire request
     initializedHook({ doc: { filename: 'test.jpg' } })
     expect(adapter.delete).toBeCalledTimes(1)
   })
@@ -34,7 +33,6 @@ describe('main plugin', () => {
 
     initializedHook({
       data,
-      // @ts-expect-error don't need to mock out entire request
       req
     })
 
@@ -63,7 +61,6 @@ describe('main plugin', () => {
 
     initializedHook({
       data,
-      // @ts-expect-error don't need to mock out entire request
       req
     })
 
