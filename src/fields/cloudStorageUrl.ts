@@ -14,7 +14,11 @@ const getCloudStorageUrlField = (adapter: AdapterInterface): Field => {
         (): undefined => undefined,
       ],
       afterRead: [
-        ({ data }): string => adapter.getEndpointUrl(data)
+        ({ data }) => {
+          if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+            return adapter.getEndpointUrl(data)
+          }
+        }
       ],
     },
   }
