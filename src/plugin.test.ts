@@ -102,6 +102,25 @@ describe('main plugin', () => {
     expect(initialized?.collections[1]?.hooks?.afterDelete).toBeUndefined()
   })
 
+  it('attaches hooks to upload collections where upload is not an object', () => {
+    const cs = cloudStorage(adapter)
+    // @ts-ignore
+    const initialized = cs({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+    
+    // @ts-ignore
+    expect(initialized?.collections[0]?.hooks?.beforeChange).toHaveLength(1)
+    // @ts-ignore
+    expect(initialized?.collections[0]?.hooks?.afterDelete).toHaveLength(1)  })
+
   it('appends fields to uploadCollectionModifiers', () => {
     const cs = cloudStorage(adapter, {
       fields: [
@@ -187,5 +206,77 @@ describe('main plugin', () => {
     
     // @ts-ignore
     expect(initialized?.collections[0]?.upload?.adminThumbnail()).toBe('set via collection')
+  })
+
+  it('provides a default virtual field for cloudStorageUrl', () => {
+    const cs = cloudStorage(adapter)
+
+    const initialized = cs({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+
+    // @ts-ignore
+    expect(initialized?.collections?.[0]?.fields?.[0]?.name).toBe('cloudStorageUrl')
+  })
+
+  it('can specify to remove virtual field for cloudStorageUrl', () => {
+    const cs = cloudStorage(adapter, {
+      fields: false
+    })
+
+    const initialized = cs({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+
+    // @ts-ignore
+    expect(initialized?.collections?.[0]?.fields?.[0]?.name).toBeUndefined()
+  })
+
+  it('adds an adminThumbnail if default field is added', () => {
+    const cs1 = cloudStorage(adapter)
+    const cs2 = cloudStorage(adapter, {
+      fields: false
+    })
+
+    const initialized1 = cs1({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+
+    const initialized2 = cs2({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: {},
+        },
+      ]
+    })
+
+    // @ts-ignore
+    expect(typeof initialized1?.collections?.[0]?.upload?.adminThumbnail).toBe('function')
+    // @ts-ignore
+    expect(typeof initialized2?.collections?.[0]?.upload?.adminThumbnail).toBeUndefined()
   })
 })

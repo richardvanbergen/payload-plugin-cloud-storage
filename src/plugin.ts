@@ -15,26 +15,29 @@ const cloudStorage = (
   adapter: AdapterInterface,
   uploadCollectionModifiers?: CloudStorageCollectionModifiers
 ) => {
+  const autoAddFields = uploadCollectionModifiers?.fields !== false
+
   return (incommingConfig: Config): Config => {
     if (!incommingConfig.collections) {
       return incommingConfig
     }
 
-    let additionalFields: Field[] = []
-    if (uploadCollectionModifiers?.fields !== false) {
-      additionalFields = uploadCollectionModifiers?.fields ?? [getCloudStorageUrlField(adapter)]
-    }
+    const fieldDefaults = autoAddFields ? [getCloudStorageUrlField(adapter)] : []
+    const additionalFields = uploadCollectionModifiers?.fields || fieldDefaults
 
     const config: Config = {
       ...incommingConfig,
       collections: incommingConfig.collections.map(collection => {
-        if (typeof collection.upload === 'object') {
-          if (Array.isArray(uploadCollectionModifiers?.fields) && uploadCollectionModifiers?.fields.length) {
-            collection.fields = [
-              ...collection.fields,
-              ...additionalFields
-            ]
-          }
+        if (collection.upload === true) {
+          collection.upload = {}
+        }
+
+        if (typeof collection.upload === 'object' && collection.upload !== null && !Array.isArray(collection.upload)) {
+          collection.fields = collection.fields || []
+          collection.fields = [
+            ...collection.fields,
+            ...additionalFields
+          ]
 
           const {
             beforeChange = [],
