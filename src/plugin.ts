@@ -16,14 +16,13 @@ const cloudStorage = (
   uploadCollectionModifiers?: CloudStorageCollectionModifiers
 ) => {
   const autoAddFields = uploadCollectionModifiers?.fields !== false
+  const fieldDefaults = autoAddFields ? [getCloudStorageUrlField(adapter)] : []
+  const additionalFields = uploadCollectionModifiers?.fields || fieldDefaults
 
   return (incommingConfig: Config): Config => {
     if (!incommingConfig.collections) {
       return incommingConfig
     }
-
-    const fieldDefaults = autoAddFields ? [getCloudStorageUrlField(adapter)] : []
-    const additionalFields = uploadCollectionModifiers?.fields || fieldDefaults
 
     const config: Config = {
       ...incommingConfig,
