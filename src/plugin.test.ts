@@ -227,9 +227,7 @@ describe('main plugin', () => {
   })
 
   it('can specify to remove virtual field for cloudStorageUrl', () => {
-    const cs = cloudStorage(adapter, {
-      fields: false
-    })
+    const cs = cloudStorage(adapter, false)
 
     const initialized = cs({
       collections: [
@@ -248,9 +246,7 @@ describe('main plugin', () => {
 
   it('adds an adminThumbnail if default field is added', () => {
     const cs1 = cloudStorage(adapter)
-    const cs2 = cloudStorage(adapter, {
-      fields: false
-    })
+    const cs2 = cloudStorage(adapter, false)
 
     const initialized1 = cs1({
       collections: [
@@ -269,14 +265,14 @@ describe('main plugin', () => {
         {
           slug: 'image',
           // @ts-ignore
-          upload: {},
+          upload: true,
         },
       ]
     })
 
     // @ts-ignore
-    expect(typeof initialized1?.collections?.[0]?.upload?.adminThumbnail).toBe('function')
+    expect(initialized1?.collections?.[0]?.upload?.adminThumbnail).toBe('cloudStorageUrl')
     // @ts-ignore
-    expect(typeof initialized2?.collections?.[0]?.upload?.adminThumbnail).toBeUndefined()
+    expect(initialized2?.collections?.[0]?.upload?.adminThumbnail).toBeUndefined()
   })
 })

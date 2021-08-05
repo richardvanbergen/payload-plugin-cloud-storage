@@ -4,29 +4,32 @@ import { GetAdminThumbnail } from 'payload/dist/uploads/types'
 import uploadHook from './hooks/uploadHook'
 import deleteHook from './hooks/deleteHook'
 import { AdapterInterface } from './adapter'
-import getCloudStorageUrlField from './fields/cloudStorageUrl'
+import getCloudStorageUrlField, { cloudStorageFieldName } from './fields/cloudStorageUrl'
 
 export type CloudStorageCollectionModifiers = {
-  fields?: Field[] | false | undefined,
-  adminThumbnail?: string | GetAdminThumbnail | false | undefined
+  fields?: Field[],
+  adminThumbnail?: string | GetAdminThumbnail
 }
 
 const cloudStorage = (
   adapter: AdapterInterface,
-  uploadCollectionModifiers?: CloudStorageCollectionModifiers
+  uploadCollectionModifiers?: CloudStorageCollectionModifiers | false
 ) => {
-  const autoAddFields = uploadCollectionModifiers?.fields !== false
-  const fieldDefaults = autoAddFields ? [getCloudStorageUrlField(adapter)] : []
-  const additionalFields = uploadCollectionModifiers?.fields || fieldDefaults
+  let fields: Field[] = []
+  let adminThumbnail: GetAdminThumbnail | string
+  if (uploadCollectionModifiers !== false) {
+    fields = uploadCollectionModifiers?.fields ?? [getCloudStorageUrlField(adapter)]
+    adminThumbnail = uploadCollectionModifiers?.adminThumbnail ?? cloudStorageFieldName
+  }
 
-  return (incommingConfig: Config): Config => {
-    if (!incommingConfig.collections) {
-      return incommingConfig
+  return (incomingConfig: Config): Config => {
+    if (!incomingConfig.collections) {
+      return incomingConfig
     }
 
     const config: Config = {
-      ...incommingConfig,
-      collections: incommingConfig.collections.map(collection => {
+      ...incomingConfig,
+      collections: incomingConfig.collections.map(collection => {
         if (collection.upload === true) {
           collection.upload = {}
         }
@@ -35,7 +38,7 @@ const cloudStorage = (
           collection.fields = collection.fields || []
           collection.fields = [
             ...collection.fields,
-            ...additionalFields
+            ...fields
           ]
 
           const {
@@ -55,9 +58,10 @@ const cloudStorage = (
             ],
           }
 
-          if (uploadCollectionModifiers?.adminThumbnail && typeof collection?.upload?.adminThumbnail === 'undefined') {
-            collection.upload.adminThumbnail = uploadCollectionModifiers.adminThumbnail
-          }
+          const existingAT = collection.upload.adminThumbnail
+          collection.upload.adminThumbnail = (typeof existingAT === 'string' || typeof existingAT === 'function')
+            ? collection.upload.adminThumbnail
+            : adminThumbnail
         }
 
         return collection

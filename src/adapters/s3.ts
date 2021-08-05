@@ -19,8 +19,12 @@ export default class S3Adapter implements AdapterInterface {
     this.getEndpointUrlRef = getEndpoint
   }
 
-  getEndpointUrl(data: { filename: string; }) {
-    return `${this.options.endpointUrl}/${data.filename}`
+  getEndpointUrl(data: { [key: string]: unknown; }) {
+    if (typeof data?.filename === 'string') {
+      return `${this.options.endpointUrl}/${data.filename}`
+    }
+
+    return ''
   };
 
   async upload(filename: string, file: UploadedFile): Promise<void> {

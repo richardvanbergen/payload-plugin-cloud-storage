@@ -1,10 +1,12 @@
 import { Field } from 'payload/types'
 import { AdapterInterface } from '../adapter'
 
+export const cloudStorageFieldName = 'cloudStorageUrl'
+
 const getCloudStorageUrlField = (adapter: AdapterInterface): Field => {
   return {
     label: 'Cloud Storage URL',
-    name: 'cloudStorageUrl',
+    name: cloudStorageFieldName,
     type: 'text',
     admin: {
       readOnly: true,

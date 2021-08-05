@@ -1,17 +1,17 @@
-# payload-plugin-cloud-storage
+# Payload Plugin - Cloud Storage
 
-**DISCLAIMER: While I welcome early feedback, this library is still in development and I haven't even done any real-world integration testing yet. As you can probably tell by the TODOs and the poorly written documentation bellow, use at your own risk. It's only published so I can test the release and publish mechanisms. :)**
+## TODO
 
-## todo
+This plugin is still under development. 
 
-- [ ] Tidy up documention
+- [x] Tidy up documention
 - [x] Publish to NPM
 - [x] Create workflow for publishing to NPM
 - [ ] Add support for upload `sizes`
 - [ ] Add cloudinary support (?)
 - [x] Test in situation
 - [ ] Add option for disabling local storage
-- [ ] Update payload version and add new types
+- [x] Update payload version and add new types
 - [ ] Add build/coverage/version badges
 
 ## Installation
@@ -91,10 +91,12 @@ The URL returned is determined by the adapter you're using in its implementation
 
 `cloudStorage` allows you to pass a second `uploadCollectionModifiers` parameter which allows you to fully modify the default behavior.
 
-| Property       | Required | values                     | Description                                                                                                                                                                                                                                                                                                                                                    |
-|----------------|----------|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| fields         | no       | Field[] \| false           | If an array of payload `Field`, then this will replace the default virtual configuration fields that get added to the collection.<br><br>  Passing `false` will disable the virtual fields and not provide a replacement.                                                                                                                                      |
-| adminThumbnail | no       | GetAdminThumbnail \| false | Passing a payload `GetAdminThumbnail` compatible function will override the default method we use to fetch the admin thumbnail.<br><br>  Passing `false` will disable it entriely.<br><br>  Note: This function will not be override any [upload.adminThumbnail]() methods specified directly on the collection. It'll only apply if it doesn't already exist. |
+| Property       | Required | values                     | Description                                                                                                                                                                                                                                                                                                |
+|----------------|----------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| fields         | no       | Field[]                    | If an array of payload `Field`, then this will replace the default virtual configuration fields that get added to the collection.<br><br>                                                                                                                                                                  |
+| adminThumbnail | no       | GetAdminThumbnail          | Passing a payload `GetAdminThumbnail` compatible function will override the default method we use to fetch the admin thumbnail.<br><br> Note: This function will not be override any [upload.adminThumbnail]() methods specified directly on the collection. It'll only apply if it doesn't already exist. |
+
+Explicitly passing `false` to `uploadCollectionModifiers` will disable all modifications to collections made by these plugins.
 
 **Example**
 
