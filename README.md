@@ -7,7 +7,7 @@ This plugin is still under development.
 - [x] Tidy up documention
 - [x] Publish to NPM
 - [x] Create workflow for publishing to NPM
-- [ ] Add support for upload `sizes`
+- [x] Add support for upload `sizes`
 - [ ] Add cloudinary support (?)
 - [x] Test in situation
 - [ ] Add option for disabling local storage

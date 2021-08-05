@@ -1,9 +1,12 @@
-import { UploadedFile } from "express-fileupload";
+export type UploadedFile = {
+  data: Buffer
+  mimetype: string
+}
 
-export type getEndpointUrl = (data: { [key: string]: unknown }) => string;
+export type getEndpointUrl = (data: { [key: string]: unknown }) => string
 
 export interface AdapterInterface {
-  upload(filename: string, file: UploadedFile): Promise<void>;
-  delete(filename: string): Promise<void>;
-  getEndpointUrl: getEndpointUrl;
+  upload(filename: string, file: UploadedFile): Promise<void>
+  delete(filename: string): Promise<void>
+  getEndpointUrl: getEndpointUrl
 }

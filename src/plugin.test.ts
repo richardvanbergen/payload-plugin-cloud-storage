@@ -44,6 +44,8 @@ describe('main plugin', () => {
     expect(adapter.upload).toBeCalledTimes(1)
   })
 
+  it.todo('uploads sizes')
+
   it('can fetch first file from array of files', () => {
     const initializedHook = uploadHook(adapter)
     const data = {
