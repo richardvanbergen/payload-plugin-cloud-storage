@@ -1,45 +1,44 @@
-# payload-plugin-cloud-storage
+# Payload Plugin - Cloud Storage
 
-**DISCLAIMER: While I welcome early feedback, this library is still in development and I haven't even done any real-world integration testing yet. As you can probably tell by the TODOs and the poorly written documentation bellow, use at your own risk. It's only published so I can test the release and publish mechanisms. :)**
+## TODO
 
-## todo
+This plugin is still under development. 
 
-- [ ] Tidy up documention
+- [x] Tidy up documention
 - [x] Publish to NPM
 - [x] Create workflow for publishing to NPM
 - [ ] Add support for upload `sizes`
 - [ ] Add cloudinary support (?)
 - [x] Test in situation
 - [ ] Add option for disabling local storage
-- [ ] Update payload version and add new types
+- [x] Update payload version and add new types
 - [ ] Add build/coverage/version badges
 
-docs coming soon, just looking for feedback right now, I promise it'll be shiny
+## Installation
 
-the idea of this plugin is to implement a simple cloud storage plugin that allows the user to upload thier collections with `upload` to any major cloud storage provider
+```
+npm i plugin-payload-cloud-storage
+```
 
-currently I only support S3 because that's my use case (digital ocean storage)
+```
+yarn add plugin-payload-cloud-storage
+```
 
-this hasn't been tested yet, I'm just looking for feedback on the usage pattern
+## Basic Usage
+
+### Adapters
+
+First, instantiate an adapter. Currently we only support S3 but this will change soon so the adapter encapsulates all vendor-specific configuration and setup.
+
+#### S3 (AWS and Digital Ocean)
 
 ```ts
-// src/plugins/cloudStorage.ts
-import { Field } from 'payload/types'
-import { GetAdminThumbnail } from 'payload/dist/uploads/types'
 import { S3Adapter } from 'payload-plugin-cloud-storage';
 
-/**
- * `S3Adapter` is simply a class that implements `AdapterInterface` this
- * pattern should support any cloud service provider that:
- * 
- * 1. Allows you to push binary objects to a store with a name.
- * 2. Allows you to delete an object from the store.
- * 3. Provides an endpoint that we can reference when the collection is queried.
- */
 const s3Adapater = new S3Adapter(
   {
     endpoint: `https://${process.env.SPACES_REGION}.digitaloceanspaces.com`,
-    region: 'fra1',
+    region: process.env.SPACES_REGION,
     credentials: {
       accessKeyId: process.env.SPACES_KEY,
       secretAccessKey: process.env.SPACES_SECRET,
@@ -47,16 +46,68 @@ const s3Adapater = new S3Adapter(
   },
   {
     bucket: process.env.SPACES_NAME,
+    endpointUrL: `https://${process.env.SPACES_NAME}.${process.env.SPACES_REGION}.cdn.digitaloceanspaces.com`
   },
+  (endpointUrL, file) => {
+    return `${endpoint}/${data.filename}`
+  }
 )
+```
 
+### The Plugin
+
+The plugin attaches itself to all collections that specify an `upload` key. The at it's most basic, the plugin will provide:
+
+- A `beforeChange` hook that pushes uploaded files to the relevant cloud storage.
+- An `afterDelete` hook that removes files from cloud storage after the document has been deleted in Payload.
+- A virtual field the points to the remote file. (a field on the collection that is computed from other data at runtime)
+- An `upload.adminThumbnail` that references the virtual field.
+
+```ts
+const config = buildConfig({
+  serverURL: 'http://localhost:3000',
+  collections: [
+    {
+      slug: 'images',
+      upload: true, // uploads being enabled is what enables this plugin on the collection
+      fields: []
+    }
+  ],
+  plugins: [
+    cloudStorage(s3Adapater)
+  ]
+})
+```
+
+By default, the virtual field that is added is named `cloudStorageUrl` and it has an `afterRead` that returns an full URL to the file.
+
+The URL returned is determined by the adapter you're using in its implementation of `AdapterInterface.getEndpointUrl`.
+
+| Adapter   | Template                     | Description                                                                                                                                      |
+|-----------|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| S3Adapter | {{endpointUrl}}/{{filename}} | `endpointUrl` is determined by `options.endpointUrl` and filename is returned by payloads `afterRead` field hook in the form of `data.filename`. |
+
+## Advanced Options
+
+`cloudStorage` allows you to pass a second `uploadCollectionModifiers` parameter which allows you to fully modify the default behavior.
+
+| Property       | Required | values                     | Description                                                                                                                                                                                                                                                                                                |
+|----------------|----------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| fields         | no       | Field[]                    | If an array of payload `Field`, then this will replace the default virtual configuration fields that get added to the collection.<br><br>                                                                                                                                                                  |
+| adminThumbnail | no       | GetAdminThumbnail          | Passing a payload `GetAdminThumbnail` compatible function will override the default method we use to fetch the admin thumbnail.<br><br> Note: This function will not be override any [upload.adminThumbnail]() methods specified directly on the collection. It'll only apply if it doesn't already exist. |
+
+Explicitly passing `false` to `uploadCollectionModifiers` will disable all modifications to collections made by these plugins.
+
+**Example**
+
+Following from the Basic Usage example above.
+
+```ts
+import { Field } from 'payload/types'
+import { GetAdminThumbnail } from 'payload/dist/uploads/types'
 
 /**
- * You may also want to attach additionl fields on all upload collections.
- * 
- * For example you might want to specify a way of outputting the full CDN path of files that get uoloaded in your API responses.
- * 
- * You can pass in these field definitions using the second optional parameter to `cloudStorage()`
+ * uploadCollectionModifiers.fields
  */
 export const cloudStorageFields: Field[] = [
   {
@@ -80,9 +131,7 @@ export const cloudStorageFields: Field[] = [
 ]
 
 /**
- * Finally you can also specify how to fetch the admin URL using the same signature as if you would for other colections.
- * 
- * This does not override any exising `upload.adminThumbnail` on your collection.
+ * uploadCollectionModifiers.fields
  */
 const adminThumbnail: GetAdminThumbnail = (args) => {
   if (typeof args?.doc?.cloudStorageUrl === 'string') {
@@ -93,23 +142,11 @@ const adminThumbnail: GetAdminThumbnail = (args) => {
   return ''
 }
 
-```
-
-```ts
-// src/payload.config.ts
-import { buildConfig } from 'payload/config';
-import cloudStorage from 'payload-plugin-cloud-storage'
-import { s3Adapater, cloudStorageFields, adminThumbnail } from './plugins/cloudStorage.ts'
-
+/**
+ * Added to configuration like this.
+ */
 const config = buildConfig({
-  serverURL: 'http://localhost:3000',
-  collections: [
-    {
-      slug: 'images',
-      upload: true, // uploads being enabled is what enables this plugin on the collection
-      fields: []
-    }
-  ],
+  // ...
   plugins: [
     cloudStorage(
       s3Adapater,
@@ -120,8 +157,4 @@ const config = buildConfig({
     ),
   ]
 });
-
-export default config;
 ```
-
-You may also want to attach additionl fields on all upload collections. For example you might want to specify a way of outputting the full CDN path of files that get uoloaded in your API responses.

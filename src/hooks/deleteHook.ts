@@ -1,5 +1,5 @@
 import { CollectionAfterDeleteHook } from 'payload/types'
-import { AdapterInterface } from '../plugin'
+import { AdapterInterface } from '../adapter'
 
 export const deleteHook = (adapter: AdapterInterface) => {
   const afterDelete: CollectionAfterDeleteHook = async (args) => {

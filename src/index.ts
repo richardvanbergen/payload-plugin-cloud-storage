@@ -1,2 +1,2 @@
 export { default } from './plugin'
-export { S3Adapter } from './adapters/s3'
+export { default as S3Adapter } from './adapters/s3'

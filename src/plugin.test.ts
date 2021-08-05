@@ -1,7 +1,9 @@
-import { AdapterInterface } from './payload-plugin-s3'
-import cloudStorage, { deleteHook, uploadHook } from './plugin'
+import cloudStorage from './plugin'
 import { mock as mockInterface } from 'jest-mock-extended'
 import { UploadedFile } from 'express-fileupload'
+import deleteHook from './hooks/deleteHook'
+import uploadHook from './hooks/uploadHook'
+import { AdapterInterface } from './adapter'
 
 describe('main plugin', () => {
   let adapter: AdapterInterface
@@ -15,7 +17,7 @@ describe('main plugin', () => {
 
   it('can make a hook that calls adapters delete method', () => {
     const initializedHook = deleteHook(adapter)
-    // @ts-expect-error don't need to mock out entire request
+    // @ts-ignore
     initializedHook({ doc: { filename: 'test.jpg' } })
     expect(adapter.delete).toBeCalledTimes(1)
   })
@@ -34,7 +36,7 @@ describe('main plugin', () => {
 
     initializedHook({
       data,
-      // @ts-expect-error don't need to mock out entire request
+    // @ts-ignore
       req
     })
 
@@ -63,7 +65,7 @@ describe('main plugin', () => {
 
     initializedHook({
       data,
-      // @ts-expect-error don't need to mock out entire request
+      // @ts-ignore
       req
     })
 
@@ -89,12 +91,35 @@ describe('main plugin', () => {
       ]
     })
     
+    // @ts-ignore
     expect(initialized?.collections[0]?.hooks?.beforeChange).toHaveLength(1)
+    // @ts-ignore
     expect(initialized?.collections[0]?.hooks?.afterDelete).toHaveLength(1)
     
+    // @ts-ignore
     expect(initialized?.collections[1]?.hooks?.beforeChange).toBeUndefined()
+    // @ts-ignore
     expect(initialized?.collections[1]?.hooks?.afterDelete).toBeUndefined()
   })
+
+  it('attaches hooks to upload collections where upload is not an object', () => {
+    const cs = cloudStorage(adapter)
+    // @ts-ignore
+    const initialized = cs({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+    
+    // @ts-ignore
+    expect(initialized?.collections[0]?.hooks?.beforeChange).toHaveLength(1)
+    // @ts-ignore
+    expect(initialized?.collections[0]?.hooks?.afterDelete).toHaveLength(1)  })
 
   it('appends fields to uploadCollectionModifiers', () => {
     const cs = cloudStorage(adapter, {
@@ -126,6 +151,7 @@ describe('main plugin', () => {
       }
     )
     
+    // @ts-ignores
     expect(initialized?.collections[0]?.fields[1]?.name).toBe('extra field')
   })
 
@@ -134,8 +160,8 @@ describe('main plugin', () => {
       adminThumbnail: () => 'set via cs'
     })
 
-    // @ts-ignore
     const initialized = cs(
+      // @ts-ignore
       {
         collections: [
           // @ts-ignore
@@ -155,13 +181,13 @@ describe('main plugin', () => {
     expect(initialized?.collections[0]?.upload?.adminThumbnail()).toBe('set via cs')
   })
 
-  it('does not override exisint adminThumbnails', () => {
+  it('does not override existing adminThumbnails', () => {
     const cs = cloudStorage(adapter, {
       adminThumbnail: () => 'set via cs'
     })
 
-    // @ts-ignore
     const initialized = cs(
+      // @ts-ignore
       {
         collections: [
           // @ts-ignore
@@ -180,5 +206,73 @@ describe('main plugin', () => {
     
     // @ts-ignore
     expect(initialized?.collections[0]?.upload?.adminThumbnail()).toBe('set via collection')
+  })
+
+  it('provides a default virtual field for cloudStorageUrl', () => {
+    const cs = cloudStorage(adapter)
+
+    const initialized = cs({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+
+    // @ts-ignore
+    expect(initialized?.collections?.[0]?.fields?.[0]?.name).toBe('cloudStorageUrl')
+  })
+
+  it('can specify to remove virtual field for cloudStorageUrl', () => {
+    const cs = cloudStorage(adapter, false)
+
+    const initialized = cs({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+
+    // @ts-ignore
+    expect(initialized?.collections?.[0]?.fields?.[0]?.name).toBeUndefined()
+  })
+
+  it('adds an adminThumbnail if default field is added', () => {
+    const cs1 = cloudStorage(adapter)
+    const cs2 = cloudStorage(adapter, false)
+
+    const initialized1 = cs1({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+
+    const initialized2 = cs2({
+      collections: [
+        // @ts-ignore
+        {
+          slug: 'image',
+          // @ts-ignore
+          upload: true,
+        },
+      ]
+    })
+
+    // @ts-ignore
+    expect(initialized1?.collections?.[0]?.upload?.adminThumbnail).toBe('cloudStorageUrl')
+    // @ts-ignore
+    expect(initialized2?.collections?.[0]?.upload?.adminThumbnail).toBeUndefined()
   })
 })
