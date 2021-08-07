@@ -1,7 +1,6 @@
 import { UploadedFile } from 'express-fileupload'
 import { CollectionBeforeChangeHook } from 'payload/types'
 import { AdapterInterface } from '../adapter'
-import sharp from 'sharp'
 
 const uploadHook = (adapter: AdapterInterface) => {
   const beforeChange: CollectionBeforeChangeHook = async (args) => {
@@ -15,28 +14,23 @@ const uploadHook = (adapter: AdapterInterface) => {
           uploadedFile = req.files.file
         }
 
-        if (data?.sizes) {
-          for (const i in data.sizes) {
-            const currentSize = data.sizes[i]
-            const { width, height } = currentSize
-            const resizedFile = await sharp(uploadedFile.data)
-              .resize({
-                width,
-                height,
-                fit: 'cover'
+        const resizedBuffers = req.payloadUploadSizes
+          ? Object.keys(req.payloadUploadSizes).map(uploadSize => {
+            const name = data?.sizes?.[uploadSize]?.filename
+            const mimeType = data?.sizes?.[uploadSize]?.mimeType
+            const buffer = req?.payloadUploadSizes?.[uploadSize]
+            if (name && mimeType && buffer) {
+              return adapter.upload(name, {
+                data: buffer,
+                mimetype: mimeType
               })
-              .toBuffer({
-                resolveWithObject: true,
-              })
+            }
 
-            await adapter.upload(currentSize.filename, {
-              data: resizedFile.data,
-              mimetype: uploadedFile.mimetype
-            })
-          }
-        }
+            throw new Error(`Size '${uploadSize}' not found.`)
+          })
+          : []
 
-        await adapter.upload(data.filename, uploadedFile)
+        await Promise.all([adapter.upload(data.filename, uploadedFile), ...resizedBuffers])
       }
 
       return data
