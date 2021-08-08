@@ -20,17 +20,16 @@ const uploadHook = (adapter: AdapterInterface) => {
             const mimeType = data?.sizes?.[uploadSize]?.mimeType
             const buffer = req?.payloadUploadSizes?.[uploadSize]
             if (name && mimeType && buffer) {
-              return adapter.upload(name, {
+              return adapter.upload({
+                name,
                 data: buffer,
                 mimetype: mimeType
               })
             }
-
-            throw new Error(`Size '${uploadSize}' not found.`)
           })
           : []
 
-        await Promise.all([adapter.upload(data.filename, uploadedFile), ...resizedBuffers])
+        await Promise.all([adapter.upload(uploadedFile), ...resizedBuffers])
       }
 
       return data

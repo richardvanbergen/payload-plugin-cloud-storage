@@ -1,10 +1,10 @@
 import * as AWS from '@aws-sdk/client-s3'
-import { AdapterInterface, getEndpointUrl, UploadedFile } from '../adapter';
+import { AdapterInterface, getEndpointUrl, UploadedFile } from '../adapter'
 
 export type FileOptions = {
-  bucket: string;
-  endpointUrl: string;
-  acl?: 'private' | 'public-read';
+  bucket: string
+  endpointUrl: string
+  acl?: 'private' | 'public-read'
 }
 
 export default class S3Adapter implements AdapterInterface {
@@ -18,18 +18,14 @@ export default class S3Adapter implements AdapterInterface {
     this.getEndpointUrlRef = getEndpoint
   }
 
-  getEndpointUrl(data: { [key: string]: unknown; }) {
-    if (typeof data?.filename === 'string') {
-      return `${this.options.endpointUrl}/${data.filename}`
-    }
+  getEndpointUrl(filename: string) {
+    return `${this.options.endpointUrl}/${filename}`
+  }
 
-    return ''
-  };
-
-  async upload(filename: string, file: UploadedFile): Promise<void> {
+  async upload(file: UploadedFile): Promise<void> {
     await this.instance.putObject({
       Bucket: this.options.bucket,
-      Key: String(filename),
+      Key: file.name,
       Body: file.data,
       ACL: this.options.acl,
       ContentType: file.mimetype,
