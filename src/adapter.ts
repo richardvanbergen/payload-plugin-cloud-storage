@@ -4,10 +4,10 @@ export type UploadedFile = {
   mimetype: string
 }
 
-export type getEndpointUrl = (filename: string) => string
+export type getEndpointUrl = (endpointUrl: string, filename: string) => string
 
 export interface AdapterInterface {
   upload(file: UploadedFile): Promise<void>
   delete(filename: string): Promise<void>
-  getEndpointUrl: getEndpointUrl
+  getEndpointUrl(filename: string): string
 }

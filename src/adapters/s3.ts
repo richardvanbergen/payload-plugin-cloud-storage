@@ -10,15 +10,21 @@ export type FileOptions = {
 export default class S3Adapter implements AdapterInterface {
   instance: AWS.S3
   options: FileOptions
-  getEndpointUrlRef: getEndpointUrl
+  getEndpointUrlRef: getEndpointUrl | undefined
 
-  constructor(s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions, getEndpoint: getEndpointUrl) {
+  constructor(s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions, getEndpoint?: getEndpointUrl) {
     this.instance = new AWS.S3(s3Configuration)
     this.options = fileOptions
-    this.getEndpointUrlRef = getEndpoint
+    if (getEndpoint) {
+      this.getEndpointUrlRef = getEndpoint
+    }
   }
 
   getEndpointUrl(filename: string) {
+    if (this.getEndpointUrlRef) {
+      return this.getEndpointUrlRef(this.options.endpointUrl, filename)
+    }
+
     return `${this.options.endpointUrl}/${filename}`
   }
 
