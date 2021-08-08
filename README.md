@@ -60,7 +60,7 @@ The plugin attaches itself to all collections that specify an `upload` key. The 
 
 - A `beforeChange` hook that pushes uploaded files to the relevant cloud storage.
 - An `afterDelete` hook that removes files from cloud storage after the document has been deleted in Payload.
-- A virtual field the points to the remote file. (a field on the collection that is computed from other data at runtime)
+- An `afterRead` hook that adds exposes and endpoint to the file for both the main file and each of the `sizes`.
 - An `upload.adminThumbnail` that references the virtual field.
 
 ```ts
