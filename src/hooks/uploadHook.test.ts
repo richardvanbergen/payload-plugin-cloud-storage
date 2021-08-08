@@ -86,4 +86,15 @@ describe('uploadHook', () => {
     })
     expect(adapter.upload).toBeCalledTimes(2)
   })
+
+  it('does nothing if no uploaded file', () => {
+    const initializedHook = uploadHook(adapter)
+    const req = {
+    }
+
+    // @ts-ignore
+    initializedHook({ req })
+
+    expect(adapter.upload).not.toBeCalled()
+  })
 })

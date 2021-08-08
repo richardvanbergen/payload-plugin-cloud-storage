@@ -4,18 +4,18 @@ import { AdapterInterface } from '../adapter'
 
 const uploadHook = (adapter: AdapterInterface) => {
   const beforeChange: CollectionBeforeChangeHook = async (args) => {
-    if (args) {
-      const { req, data } = args
-      if (req?.files?.file) {
-        let uploadedFile: UploadedFile
-        if (Array.isArray(req.files.file)) {
-          uploadedFile = req.files.file[0]
-        } else {
-          uploadedFile = req.files.file
-        }
+    const { req, data } = args
+    if (req?.files?.file) {
+      let uploadedFile: UploadedFile
+      if (Array.isArray(req.files.file)) {
+        uploadedFile = req.files.file[0]
+      } else {
+        uploadedFile = req.files.file
+      }
 
-        const resizedBuffers = req.payloadUploadSizes
-          ? Object.keys(req.payloadUploadSizes).map(uploadSize => {
+      const resizedBuffers = req.payloadUploadSizes
+        ? Object.keys(req.payloadUploadSizes)
+          .map(uploadSize => {
             const name = data?.sizes?.[uploadSize]?.filename
             const mimeType = data?.sizes?.[uploadSize]?.mimeType
             const buffer = req?.payloadUploadSizes?.[uploadSize]
@@ -27,12 +27,10 @@ const uploadHook = (adapter: AdapterInterface) => {
               })
             }
           })
-          : []
+          .filter(buffer => typeof buffer !== 'undefined')
+        : []
 
-        await Promise.all([adapter.upload(uploadedFile), ...resizedBuffers])
-      }
-
-      return data
+      await Promise.all([adapter.upload(uploadedFile), ...resizedBuffers])
     }
   }
 

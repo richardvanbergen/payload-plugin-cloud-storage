@@ -30,23 +30,29 @@ describe('main plugin', () => {
     }
   })
 
+  it('returns config unaltered if no collections', () => {
+    const cs = cloudStorage(adapter)
+    // @ts-ignore
+    const initialized = cs({})
+
+    // @ts-ignore
+    expect(initialized?.collections?.[0]?.hooks?.beforeChange).toBeUndefined()
+  })
+
   it('attaches hooks to upload collections', () => {
     const cs = cloudStorage(adapter)
     const initialized = cs(fakeConfig)
+
+    const hooks1 = initialized?.collections?.[0]?.hooks || {}
+    const hooks2 = initialized?.collections?.[1]?.hooks || {}
+
+    expect(hooks1.beforeChange).toHaveLength(1)
+    expect(hooks1.afterDelete).toHaveLength(1)
+    expect(hooks1.afterRead).toHaveLength(1)
     
-    // @ts-ignore
-    expect(initialized?.collections[0]?.hooks?.beforeChange).toHaveLength(1)
-    // @ts-ignore
-    expect(initialized?.collections[0]?.hooks?.afterDelete).toHaveLength(1)
-    // @ts-ignore
-    expect(initialized?.collections[0]?.hooks?.afterRead).toHaveLength(1)
-    
-    // @ts-ignore
-    expect(initialized?.collections[1]?.hooks?.beforeChange).toBeUndefined()
-    // @ts-ignore
-    expect(initialized?.collections[1]?.hooks?.afterDelete).toBeUndefined()
-    // @ts-ignore
-    expect(initialized?.collections[1]?.hooks?.afterRead).toBeUndefined()
+    expect(hooks2.beforeChange).toBeUndefined()
+    expect(hooks2.afterDelete).toBeUndefined()
+    expect(hooks2.afterRead).toBeUndefined()
   })
 
   it('attaches hooks to upload collections where upload is not an object', () => {
@@ -62,11 +68,9 @@ describe('main plugin', () => {
         },
       ]
     })
-    
-    // @ts-ignore
-    expect(initialized?.collections[0]?.hooks?.beforeChange).toHaveLength(1)
-    // @ts-ignore
-    expect(initialized?.collections[0]?.hooks?.afterDelete).toHaveLength(1)
+
+    expect(initialized?.collections?.[0]?.hooks?.beforeChange).toHaveLength(1)
+    expect(initialized?.collections?.[0]?.hooks?.afterDelete).toHaveLength(1)
   })
 
   it('can disable after endpoint properties', () => {
@@ -75,10 +79,9 @@ describe('main plugin', () => {
     // @ts-ignore
     const initialized = cs(fakeConfig)
     
+    expect(initialized?.collections?.[0]?.hooks?.afterRead).toHaveLength(0)
     // @ts-ignore
-    expect(initialized?.collections[0]?.hooks?.afterRead).toHaveLength(0)
-    // @ts-ignore
-    expect(initialized?.collections[0]?.upload?.adminThumbnail).toBe(undefined)
+    expect(initialized?.collections?.[0]?.upload?.adminThumbnail).toBe(undefined)
   })
 
   it('can set the admin thumbnail property', () => {
@@ -87,7 +90,7 @@ describe('main plugin', () => {
     const initialized = cs(fakeConfig)
     
     // @ts-ignore
-    expect(initialized?.collections[0]?.upload?.adminThumbnail).toBe('set via cs')
+    expect(initialized?.collections?.[0]?.upload?.adminThumbnail).toBe('set via cs')
   })
 
   it('does not override existing adminThumbnails', () => {
@@ -110,6 +113,6 @@ describe('main plugin', () => {
     )
     
     // @ts-ignore
-    expect(initialized?.collections[0]?.upload?.adminThumbnail).toBe('set via collection')
+    expect(initialized?.collections?.[0]?.upload?.adminThumbnail).toBe('set via collection')
   })
 })
