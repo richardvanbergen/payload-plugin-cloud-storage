@@ -1,7 +1,6 @@
 import cloudStorage from './plugin'
 import { mock as mockInterface } from 'jest-mock-extended'
 import { UploadedFile } from 'express-fileupload'
-import uploadHook from './hooks/uploadHook'
 import { AdapterInterface } from './adapter'
 import { Config } from 'payload/config'
 
