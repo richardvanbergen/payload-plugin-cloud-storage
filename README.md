@@ -1,19 +1,5 @@
 # Payload Plugin - Cloud Storage
 
-## TODO
-
-This plugin is still under development. 
-
-- [x] Tidy up documention
-- [x] Publish to NPM
-- [x] Create workflow for publishing to NPM
-- [x] Add support for upload `sizes`
-- [ ] Add cloudinary support (?)
-- [x] Test in situation
-- [ ] Add option for disabling local storage
-- [x] Update payload version and add new types
-- [ ] Add build/coverage/version badges
-
 ## Installation
 
 ```
