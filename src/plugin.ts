@@ -9,6 +9,7 @@ import shouldApplyAdminThumbnail from './validation/shouldApplyAdminThumbnail'
 export type CloudStoragePluginOptions = {
   disableEndpointProperty?: boolean
   endpointPropertyName?: string
+  disableLocalStorage?: boolean
 }
 
 
@@ -16,7 +17,8 @@ const cloudStorage = (
   adapter: AdapterInterface,
   options?: CloudStoragePluginOptions
 ) => {
-  let endpointFieldName = options?.endpointPropertyName ?? 'cloudStorageUrl'
+  const endpointFieldName = options?.endpointPropertyName ?? 'cloudStorageUrl'
+  const disableLocalStorage = options?.disableLocalStorage ?? true
 
   return (incomingConfig: Config): Config => {
     if (!incomingConfig.collections) {
@@ -54,10 +56,11 @@ const cloudStorage = (
             afterRead: composedReadHooks
           }
 
-          // if has string or empty thumbnail property
           if (options?.disableEndpointProperty !== true && shouldApplyAdminThumbnail(collection?.upload?.adminThumbnail)) {
             collection.upload.adminThumbnail = initAdminThumbnail(endpointFieldName, collection.upload.adminThumbnail)
           }
+
+          collection.upload.disableLocalStorage = disableLocalStorage
         }
 
         return collection
