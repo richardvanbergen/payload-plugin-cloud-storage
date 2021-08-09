@@ -17,11 +17,11 @@ This plugin is still under development.
 ## Installation
 
 ```
-npm i plugin-payload-cloud-storage
+npm i payload-plugin-cloud-storage
 ```
 
 ```
-yarn add plugin-payload-cloud-storage
+yarn add payload-plugin-cloud-storage
 ```
 
 ## Basic Usage
@@ -46,9 +46,9 @@ const s3Adapater = new S3Adapter(
   },
   {
     bucket: process.env.SPACES_NAME,
-    endpointUrL: `https://${process.env.SPACES_NAME}.${process.env.SPACES_REGION}.cdn.digitaloceanspaces.com`
+    endpointUrl: `https://${process.env.SPACES_NAME}.${process.env.SPACES_REGION}.cdn.digitaloceanspaces.com`
   },
-  (endpointUrL, file) => {
+  (endpointUrl, file) => {
     return `${endpoint}/${data.filename}`
   }
 )
