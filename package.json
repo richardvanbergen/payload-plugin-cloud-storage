@@ -1,6 +1,6 @@
 {
   "name": "payload-plugin-cloud-storage",
-  "version": "0.0.12",
+  "version": "0.1.1",
   "description": "Plugin for uploading media from collections to cloud storage. Currently only supports S3.",
   "main": "dist/index.js",
   "license": "MIT",
@@ -11,6 +11,7 @@
   "devDependencies": {
     "@types/express-fileupload": "^1.1.7",
     "@types/jest": "^26.0.24",
+    "@types/sharp": "^0.28.5",
     "jest": "^27.0.6",
     "jest-mock-extended": "^1.0.18",
     "ts-jest": "^27.0.4",

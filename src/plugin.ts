@@ -1,26 +1,22 @@
 import { Config } from 'payload/config'
-import { Field } from 'payload/types'
-import { GetAdminThumbnail } from 'payload/dist/uploads/types'
-import uploadHook from './hooks/uploadHook'
-import deleteHook from './hooks/deleteHook'
+import uploadHook from './collection/uploadHook'
+import deleteHook from './collection/deleteHook'
+import readHook from './collection/readHook'
 import { AdapterInterface } from './adapter'
-import getCloudStorageUrlField, { cloudStorageFieldName } from './fields/cloudStorageUrl'
+import initAdminThumbnail from './collection/adminThumbnail'
+import shouldApplyAdminThumbnail from './validation/shouldApplyAdminThumbnail'
 
-export type CloudStorageCollectionModifiers = {
-  fields?: Field[],
-  adminThumbnail?: string | GetAdminThumbnail
+export type CloudStoragePluginOptions = {
+  disableEndpointProperty?: boolean
+  endpointPropertyName?: string
 }
+
 
 const cloudStorage = (
   adapter: AdapterInterface,
-  uploadCollectionModifiers?: CloudStorageCollectionModifiers | false
+  options?: CloudStoragePluginOptions
 ) => {
-  let fields: Field[] = []
-  let adminThumbnail: GetAdminThumbnail | string
-  if (uploadCollectionModifiers !== false) {
-    fields = uploadCollectionModifiers?.fields ?? [getCloudStorageUrlField(adapter)]
-    adminThumbnail = uploadCollectionModifiers?.adminThumbnail ?? cloudStorageFieldName
-  }
+  let endpointFieldName = options?.endpointPropertyName ?? 'cloudStorageUrl'
 
   return (incomingConfig: Config): Config => {
     if (!incomingConfig.collections) {
@@ -35,16 +31,15 @@ const cloudStorage = (
         }
 
         if (typeof collection.upload === 'object' && collection.upload !== null && !Array.isArray(collection.upload)) {
-          collection.fields = collection.fields || []
-          collection.fields = [
-            ...collection.fields,
-            ...fields
-          ]
-
           const {
             beforeChange = [],
             afterDelete = [],
+            afterRead = []
           } = collection.hooks || {}
+
+          const composedReadHooks = options?.disableEndpointProperty === true
+            ? afterRead
+            : [...afterRead, readHook(adapter, endpointFieldName)]
 
           collection.hooks = {
             ...collection.hooks,
@@ -56,12 +51,13 @@ const cloudStorage = (
               ...afterDelete,
               deleteHook(adapter),
             ],
+            afterRead: composedReadHooks
           }
 
-          const existingAT = collection.upload.adminThumbnail
-          collection.upload.adminThumbnail = (typeof existingAT === 'string' || typeof existingAT === 'function')
-            ? collection.upload.adminThumbnail
-            : adminThumbnail
+          // if has string or empty thumbnail property
+          if (options?.disableEndpointProperty !== true && shouldApplyAdminThumbnail(collection?.upload?.adminThumbnail)) {
+            collection.upload.adminThumbnail = initAdminThumbnail(endpointFieldName, collection.upload.adminThumbnail)
+          }
         }
 
         return collection

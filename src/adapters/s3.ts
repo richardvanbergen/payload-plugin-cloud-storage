@@ -1,36 +1,37 @@
 import * as AWS from '@aws-sdk/client-s3'
-import { UploadedFile } from 'express-fileupload';
-import { AdapterInterface, getEndpointUrl } from '../adapter';
+import { AdapterInterface, getEndpointUrl, UploadedFile } from '../adapter'
 
 export type FileOptions = {
-  bucket: string;
-  endpointUrl: string;
-  acl?: 'private' | 'public-read';
+  bucket: string
+  endpointUrl: string
+  acl?: 'private' | 'public-read'
 }
 
 export default class S3Adapter implements AdapterInterface {
   instance: AWS.S3
   options: FileOptions
-  getEndpointUrlRef: getEndpointUrl
+  getEndpointUrlRef: getEndpointUrl | undefined
 
-  constructor(s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions, getEndpoint: getEndpointUrl) {
+  constructor(s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions, getEndpoint?: getEndpointUrl) {
     this.instance = new AWS.S3(s3Configuration)
     this.options = fileOptions
-    this.getEndpointUrlRef = getEndpoint
+    if (getEndpoint) {
+      this.getEndpointUrlRef = getEndpoint
+    }
   }
 
-  getEndpointUrl(data: { [key: string]: unknown; }) {
-    if (typeof data?.filename === 'string') {
-      return `${this.options.endpointUrl}/${data.filename}`
+  getEndpointUrl(filename: string) {
+    if (this.getEndpointUrlRef) {
+      return this.getEndpointUrlRef(this.options.endpointUrl, filename)
     }
 
-    return ''
-  };
+    return `${this.options.endpointUrl}/${filename}`
+  }
 
-  async upload(filename: string, file: UploadedFile): Promise<void> {
+  async upload(file: UploadedFile): Promise<void> {
     await this.instance.putObject({
       Bucket: this.options.bucket,
-      Key: String(filename),
+      Key: file.name,
       Body: file.data,
       ACL: this.options.acl,
       ContentType: file.mimetype,
