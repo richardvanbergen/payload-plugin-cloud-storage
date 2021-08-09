@@ -110,3 +110,4 @@ If however your collection specifies a `GetAdminThumbnail` function then that wi
 |-------------------------|----------|----------------------------|-------------------------------------------------------------------------------------|
 | disableEndpointProperty | no       | boolean                    | Disable the `afterRead` hook and the custom `adminThumbnail` function entirely.     |
 | endpointPropertyName    | no       | string                     | Customize the name of the property that gets added in the plugins `afterRead` hook. |
+| disableLocalStorage     | no       | boolean                    | Passed through to `uploads.disableLocalStorage`. Defaults to `true`.                |
