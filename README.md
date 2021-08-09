@@ -1,4 +1,9 @@
-# Payload Plugin - Cloud Storage
+<h1 align="center">Payload Plugin - Cloud Storage</h1>
+
+<p align="center">
+  <img src="https://img.shields.io/github/workflow/status/richardvanbergen/payload-plugin-cloud-storage/Test">
+  <img alt="npm" src="https://img.shields.io/npm/v/payload-plugin-cloud-storage">
+</p>
 
 ## Installation
 
