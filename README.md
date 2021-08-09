@@ -1,9 +1,13 @@
 <h1 align="center">Payload Plugin - Cloud Storage</h1>
 
+<p align="center">A plugin for [Payload](https://github.com/payloadcms/payload) allowing you to easily use remote storage for all your uploads.</p>
+
 <p align="center">
   <img src="https://img.shields.io/github/workflow/status/richardvanbergen/payload-plugin-cloud-storage/Test">
   <img alt="npm" src="https://img.shields.io/npm/v/payload-plugin-cloud-storage">
 </p>
+
+
 
 ## Installation
 

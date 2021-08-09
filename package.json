@@ -1,7 +1,7 @@
 {
   "name": "payload-plugin-cloud-storage",
-  "version": "0.1.1",
-  "description": "Plugin for uploading media from collections to cloud storage. Currently only supports S3.",
+  "version": "1.0.0",
+  "description": "Remote storage plugin for Payload CMS.",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
