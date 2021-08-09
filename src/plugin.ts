@@ -1,10 +1,9 @@
 import { Config } from 'payload/config'
-import { GetAdminThumbnail } from 'payload/dist/uploads/types'
 import uploadHook from './collection/uploadHook'
 import deleteHook from './collection/deleteHook'
 import readHook from './collection/readHook'
 import { AdapterInterface } from './adapter'
-import isImage from './validation/isImage'
+import initAdminThumbnail from './collection/adminThumbnail'
 import shouldApplyAdminThumbnail from './validation/shouldApplyAdminThumbnail'
 
 export type CloudStoragePluginOptions = {
@@ -12,29 +11,6 @@ export type CloudStoragePluginOptions = {
   endpointPropertyName?: string
 }
 
-type Sizes = {
-  [key: string]: {
-    [key: string]: string
-  }
-}
-
-const getAdminThumbnailFn = (endpointPropertyName: string, existingValue: unknown): GetAdminThumbnail => {
-  return ({ doc }) => {
-    if (isImage(doc?.mimeType)) {
-      const sizes = doc?.sizes as Sizes
-      if (typeof existingValue === 'string') {
-        const targetSize = sizes?.[existingValue]?.[endpointPropertyName]
-        if (targetSize) {
-          return targetSize
-        }
-      }
-
-      return doc[endpointPropertyName] as string
-    }
-
-    return ''
-  }
-}
 
 const cloudStorage = (
   adapter: AdapterInterface,
@@ -80,7 +56,7 @@ const cloudStorage = (
 
           // if has string or empty thumbnail property
           if (options?.disableEndpointProperty !== true && shouldApplyAdminThumbnail(collection?.upload?.adminThumbnail)) {
-            collection.upload.adminThumbnail = getAdminThumbnailFn(endpointFieldName, collection.upload.adminThumbnail)
+            collection.upload.adminThumbnail = initAdminThumbnail(endpointFieldName, collection.upload.adminThumbnail)
           }
         }
 

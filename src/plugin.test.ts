@@ -1,15 +1,11 @@
 import cloudStorage from './plugin'
 import { mock as mockInterface } from 'jest-mock-extended'
-import { UploadedFile } from 'express-fileupload'
 import { AdapterInterface } from './adapter'
 import { Config } from 'payload/config'
 
 describe('main plugin', () => {
   let adapter: AdapterInterface
   let fakeConfig: Config 
-  const testFile = mockInterface<UploadedFile>({
-    name: 'test.image'
-  })
 
   beforeEach(() => {
     adapter = mockInterface<AdapterInterface>()
@@ -89,7 +85,7 @@ describe('main plugin', () => {
     const initialized = cs(fakeConfig)
     
     // @ts-ignore
-    expect(initialized?.collections?.[0]?.upload?.adminThumbnail).toBe('set via cs')
+    expect(typeof initialized?.collections?.[0]?.upload?.adminThumbnail).toBe('function')
   })
 
   it('does not override existing adminThumbnails', () => {
@@ -104,7 +100,7 @@ describe('main plugin', () => {
             slug: 'image',
             // @ts-ignore
             upload: {
-              adminThumbnail: 'set via collection'
+              adminThumbnail: () => 'set via collection'
             },
           },
         ]
@@ -112,6 +108,6 @@ describe('main plugin', () => {
     )
     
     // @ts-ignore
-    expect(initialized?.collections?.[0]?.upload?.adminThumbnail).toBe('set via collection')
+    expect(initialized?.collections?.[0]?.upload?.adminThumbnail()).toBe('set via collection')
   })
 })
