@@ -26,11 +26,11 @@ yarn add plugin-payload-cloud-storage
 
 ## Basic Usage
 
-### Adapters
+### 1. Instantiate an adapter
 
-First, instantiate an adapter. Currently we only support S3 but this will change soon so the adapter encapsulates all vendor-specific configuration and setup.
+Adapters encapsulate all vendor-specific configuration and API calls.
 
-#### S3 (AWS and Digital Ocean)
+Currently we only support S3 or S3-compatible APIs (like DigitalOcean spaces) but this will change soon!
 
 ```ts
 import { S3Adapter } from 'payload-plugin-cloud-storage';
@@ -55,7 +55,7 @@ const s3Adapter = new S3Adapter(
 )
 ```
 
-### The Plugin
+### 2. Add the plugin to Payloads configuration
 
 The plugin attaches itself to all collections that specify an `upload` key. The at it's most basic, the plugin will provide:
 
@@ -79,6 +79,8 @@ const config = buildConfig({
   ]
 })
 ```
+
+## Referencing files uploaded by the plugin
 
 By default the endpoint property is named `cloudStorageUrl` and it is added to both the main document and each of the [image sizes](https://payloadcms.com/docs/upload/overview#image-sizes) on the [collections afterRead](https://payloadcms.com/docs/hooks/collections#afterread) hook.
 
@@ -106,7 +108,7 @@ By default the endpoint property is named `cloudStorageUrl` and it is added to b
 }
 ```
 
-### Admin Thumbnails
+## Admin Thumbnails
 
 The admin thumbnail function the plugin provides tries to transparently support the same functions that [Payload itself does](https://payloadcms.com/docs/upload/overview#admin-thumbnails).
 
