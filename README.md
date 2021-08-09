@@ -7,8 +7,6 @@
   <img alt="npm" src="https://img.shields.io/npm/v/payload-plugin-cloud-storage">
 </p>
 
-
-
 ## Installation
 
 ```

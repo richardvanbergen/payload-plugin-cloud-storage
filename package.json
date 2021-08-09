@@ -1,8 +1,21 @@
 {
   "name": "payload-plugin-cloud-storage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Remote storage plugin for Payload CMS.",
   "main": "dist/index.js",
+  "author": {
+    "name": "Richard Vanbergen",
+    "email": "rich.vanbergen@gmail.com",
+    "url": "https://github.com/richardvanbergen"
+  },
+  "homepage": "https://github.com/richardvanbergen/payload-plugin-cloud-storage",
+  "sideEffects": false,
+  "keywords": [
+    "S3", "payload", "typescript", "cloud", "storage", "plugin"
+  ],
+  "bugs": {
+    "url": "https://github.com/richardvanbergen/payload-plugin-cloud-storage/issues"
+  },
   "license": "MIT",
   "scripts": {
     "build": "tsc",
