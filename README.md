@@ -35,7 +35,7 @@ First, instantiate an adapter. Currently we only support S3 but this will change
 ```ts
 import { S3Adapter } from 'payload-plugin-cloud-storage';
 
-const s3Adapater = new S3Adapter(
+const s3Adapter = new S3Adapter(
   {
     endpoint: `https://${process.env.SPACES_REGION}.digitaloceanspaces.com`,
     region: process.env.SPACES_REGION,
@@ -48,6 +48,7 @@ const s3Adapater = new S3Adapter(
     bucket: process.env.SPACES_NAME,
     endpointUrL: `https://${process.env.SPACES_NAME}.${process.env.SPACES_REGION}.cdn.digitaloceanspaces.com`
   },
+  // optional, use your own getEndpoint method
   (endpointUrL, file) => {
     return `${endpoint}/${data.filename}`
   }
@@ -60,8 +61,8 @@ The plugin attaches itself to all collections that specify an `upload` key. The 
 
 - A `beforeChange` hook that pushes uploaded files to the relevant cloud storage.
 - An `afterDelete` hook that removes files from cloud storage after the document has been deleted in Payload.
-- An `afterRead` hook that adds exposes and endpoint to the file for both the main file and each of the `sizes`.
-- An `upload.adminThumbnail` that references the virtual field.
+- An `afterRead` hook that adds returns an endpoint to the file for both the main file and each of the `sizes`.
+- A custom `upload.adminThumbnail` function, see []().
 
 ```ts
 const config = buildConfig({
@@ -74,12 +75,40 @@ const config = buildConfig({
     }
   ],
   plugins: [
-    cloudStorage(s3Adapater)
+    cloudStorage(s3Adapter)
   ]
 })
 ```
 
-By default, the virtual field that is added is named `cloudStorageUrl` and it has an `afterRead` that returns an full URL to the file.
+By default the endpoint property is named `cloudStorageUrl` and it is added to both the main document and each of the [image sizes](https://payloadcms.com/docs/upload/overview#image-sizes) on the [collections afterRead](https://payloadcms.com/docs/hooks/collections#afterread) hook.
+
+```ts
+{
+  "id": "6110b3ba2ecab80501b31fa6",
+  "width": 1247,
+  "height": 968,
+  "sizes": {
+    "mobile": {
+      "width": 1000,
+      "height": 1000,
+      "filename": "test-5-1000x1000.jpg",
+      "mimeType": "image/jpeg",
+      "filesize": 41329,
+      "cloudStorageUrl": "https://brightvision.fra1.cdn.digitaloceanspaces.com/test-1000x1000.jpg"
+    }
+  },
+  "filename": "test.jpg",
+  "filesize": 142083,
+  "mimeType": "image/jpeg",
+  "createdAt": "2021-08-09T04:48:58.577Z",
+  "updatedAt": "2021-08-09T04:57:16.992Z",
+  "cloudStorageUrl": "https://brightvision.fra1.cdn.digitaloceanspaces.com/test.jpg"
+}
+```
+
+### Admin Thumbnails
+
+The admin thumbnail function the plugin provides tries to transparently support the 
 
 The URL returned is determined by the adapter you're using in its implementation of `AdapterInterface.getEndpointUrl`.
 
