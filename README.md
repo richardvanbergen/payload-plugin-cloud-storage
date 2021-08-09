@@ -62,7 +62,7 @@ The plugin attaches itself to all collections that specify an `upload` key. The 
 - A `beforeChange` hook that pushes uploaded files to the relevant cloud storage.
 - An `afterDelete` hook that removes files from cloud storage after the document has been deleted in Payload.
 - An `afterRead` hook that adds returns an endpoint to the file for both the main file and each of the `sizes`.
-- A custom `upload.adminThumbnail` function, see []().
+- A custom `upload.adminThumbnail` function. See [admin thumbnails](#admin-thumbnails) for a detailed explanation on what this function does.
 
 ```ts
 const config = buildConfig({
@@ -108,82 +108,17 @@ By default the endpoint property is named `cloudStorageUrl` and it is added to b
 
 ### Admin Thumbnails
 
-The admin thumbnail function the plugin provides tries to transparently support the 
+The admin thumbnail function the plugin provides tries to transparently support the same functions that [Payload itself does](https://payloadcms.com/docs/upload/overview#admin-thumbnails).
 
-The URL returned is determined by the adapter you're using in its implementation of `AdapterInterface.getEndpointUrl`.
+If your collection has an `upload.adminThumbnail` set as `string`, then it will try to pull the image from that size same as the default behavior. If somehow that size doesn't exist then it'll fallback to the main image.
 
-| Adapter   | Template                     | Description                                                                                                                                      |
-|-----------|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| S3Adapter | {{endpointUrl}}/{{filename}} | `endpointUrl` is determined by `options.endpointUrl` and filename is returned by payloads `afterRead` field hook in the form of `data.filename`. |
+If however your collection specifies a `GetAdminThumbnail` function then that will take precedence over the plugin provided function.
 
-## Advanced Options
+## Extra Options
 
-`cloudStorage` allows you to pass a second `uploadCollectionModifiers` parameter which allows you to fully modify the default behavior.
+`cloudStorage` allows you to pass a second `options` parameter.
 
-| Property       | Required | values                     | Description                                                                                                                                                                                                                                                                                                |
-|----------------|----------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| fields         | no       | Field[]                    | If an array of payload `Field`, then this will replace the default virtual configuration fields that get added to the collection.<br><br>                                                                                                                                                                  |
-| adminThumbnail | no       | GetAdminThumbnail          | Passing a payload `GetAdminThumbnail` compatible function will override the default method we use to fetch the admin thumbnail.<br><br> Note: This function will not be override any [upload.adminThumbnail]() methods specified directly on the collection. It'll only apply if it doesn't already exist. |
-
-Explicitly passing `false` to `uploadCollectionModifiers` will disable all modifications to collections made by these plugins.
-
-**Example**
-
-Following from the Basic Usage example above.
-
-```ts
-import { Field } from 'payload/types'
-import { GetAdminThumbnail } from 'payload/dist/uploads/types'
-
-/**
- * uploadCollectionModifiers.fields
- */
-export const cloudStorageFields: Field[] = [
-  {
-    label: 'Cloud Storage URL',
-    name: 'cloudStorageUrl',
-    type: 'text',
-    admin: {
-      readOnly: true,
-    },
-    hooks: {
-      beforeChange: [
-        (): undefined => undefined,
-      ],
-      afterRead: [
-        ({ data }): string => {
-          return `https://${process.env.SPACES_NAME}.${process.env.SPACES_REGION}.cdn.digitaloceanspaces.com/${data.filename}`
-        },
-      ],
-    },
-  },
-]
-
-/**
- * uploadCollectionModifiers.fields
- */
-const adminThumbnail: GetAdminThumbnail = (args) => {
-  if (typeof args?.doc?.cloudStorageUrl === 'string') {
-    return args?.doc?.cloudStorageUrl
-  }
-
-  // or handle missing image some other way
-  return ''
-}
-
-/**
- * Added to configuration like this.
- */
-const config = buildConfig({
-  // ...
-  plugins: [
-    cloudStorage(
-      s3Adapater,
-      {
-        fields: cloudStorageFields,
-        adminThumbnail: adminThumbnail
-      }
-    ),
-  ]
-});
-```
+| Property                | Required | Values                     | Description                                                                         |
+|-------------------------|----------|----------------------------|-------------------------------------------------------------------------------------|
+| disableEndpointProperty | no       | boolean                    | Disable the `afterRead` hook and the custom `adminThumbnail` function entirely.     |
+| endpointPropertyName    | no       | string                     | Customize the name of the property that gets added in the plugins `afterRead` hook. |
