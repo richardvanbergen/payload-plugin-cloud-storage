@@ -10,7 +10,8 @@ describe('uploadHook', () => {
   })
 
   const testFile = mockInterface<UploadedFile>({
-    name: 'test.image'
+    name: 'test.image',
+    mimetype: 'image'
   })
 
   it('can make a hook that calls adapters upload method', () => {
