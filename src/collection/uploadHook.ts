@@ -17,13 +17,14 @@ const uploadHook = (adapter: AdapterInterface) => {
         ? Object.keys(req.payloadUploadSizes)
           .map(uploadSize => {
             const name = data?.sizes?.[uploadSize]?.filename
-            const mimeType = data?.sizes?.[uploadSize]?.mimeType
+            const mimetype = uploadedFile?.mimetype
             const buffer = req?.payloadUploadSizes?.[uploadSize]
-            if (name && mimeType && buffer) {
+
+            if (name && mimetype && buffer) {
               return adapter.upload({
                 name,
                 data: buffer,
-                mimetype: mimeType
+                mimetype: mimetype
               })
             }
           })
