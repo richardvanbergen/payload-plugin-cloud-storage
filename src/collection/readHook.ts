@@ -9,7 +9,9 @@ const readHook = (adapter: AdapterInterface, propertyName: string) => {
 
     if (typeof doc.sizes === 'object' && doc.sizes !== null && !Array.isArray(doc.sizes)) {
       for (const i in doc.sizes) {
-        doc.sizes[i][propertyName] = adapter.getEndpointUrl(doc.sizes[i].filename)
+        if (typeof doc.sizes[i].filename === 'string') {
+          doc.sizes[i][propertyName] = adapter.getEndpointUrl(doc.sizes[i].filename)
+        }
       }
     }
 
