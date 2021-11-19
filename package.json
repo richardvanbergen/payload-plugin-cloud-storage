@@ -11,7 +11,12 @@
   "homepage": "https://github.com/richardvanbergen/payload-plugin-cloud-storage",
   "sideEffects": false,
   "keywords": [
-    "S3", "payload", "typescript", "cloud", "storage", "plugin"
+    "S3",
+    "payload",
+    "typescript",
+    "cloud",
+    "storage",
+    "plugin"
   ],
   "bugs": {
     "url": "https://github.com/richardvanbergen/payload-plugin-cloud-storage/issues"
@@ -32,6 +37,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.23.0",
-    "payload": "^0.9.4"
+    "payload": "^0.12.3"
   }
 }
