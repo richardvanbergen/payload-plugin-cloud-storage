@@ -7,7 +7,7 @@ export type FileOptions = {
   acl?: 'private' | 'public-read'
 }
 
-export default class S3Adapter implements AdapterInterface {
+export default class S3Adapter implements AdapterInterface<AWS.PutObjectCommandOutput, AWS.DeleteObjectCommandOutput> {
   instance: AWS.S3
   options: FileOptions
   getEndpointUrlRef: getEndpointUrl | undefined
@@ -28,8 +28,8 @@ export default class S3Adapter implements AdapterInterface {
     return `${this.options.endpointUrl}/${filename}`
   }
 
-  async upload (file: UploadedFile): Promise<void> {
-    await this.instance.putObject({
+  async upload (file: UploadedFile): Promise<AWS.PutObjectCommandOutput> {
+    return await this.instance.putObject({
       Bucket: this.options.bucket,
       Key: file.name,
       Body: file.data,
@@ -38,8 +38,8 @@ export default class S3Adapter implements AdapterInterface {
     })
   }
 
-  async delete (filename: string): Promise<void> {
-    await this.instance.deleteObject({
+  async delete (filename: string): Promise<AWS.DeleteObjectCommandOutput> {
+    return await this.instance.deleteObject({
       Bucket: process.env.SPACES_NAME,
       Key: String(filename)
     })
