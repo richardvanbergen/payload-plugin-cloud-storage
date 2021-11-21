@@ -5,7 +5,7 @@ import { Config } from 'payload/config'
 
 describe('main plugin', () => {
   let adapter: AdapterInterface
-  let fakeConfig: Config 
+  let fakeConfig: Config
 
   beforeEach(() => {
     adapter = mockInterface<AdapterInterface>()
@@ -15,11 +15,11 @@ describe('main plugin', () => {
         {
           slug: 'image',
           // @ts-ignore
-          upload: {},
+          upload: {}
         },
         // @ts-ignore
         {
-          slug: 'image2',
+          slug: 'image2'
         }
       ]
     }
@@ -44,7 +44,7 @@ describe('main plugin', () => {
     expect(hooks1.beforeChange).toHaveLength(1)
     expect(hooks1.afterDelete).toHaveLength(1)
     expect(hooks1.afterRead).toHaveLength(1)
-    
+
     expect(hooks2.beforeChange).toBeUndefined()
     expect(hooks2.afterDelete).toBeUndefined()
     expect(hooks2.afterRead).toBeUndefined()
@@ -59,8 +59,8 @@ describe('main plugin', () => {
         {
           slug: 'image',
           // @ts-ignore
-          upload: true,
-        },
+          upload: true
+        }
       ]
     })
 
@@ -73,7 +73,7 @@ describe('main plugin', () => {
 
     // @ts-ignore
     const initialized = cs(fakeConfig)
-    
+
     expect(initialized?.collections?.[0]?.hooks?.afterRead).toHaveLength(0)
     // @ts-ignore
     expect(initialized?.collections?.[0]?.upload?.adminThumbnail).toBe(undefined)
@@ -83,7 +83,7 @@ describe('main plugin', () => {
     const cs = cloudStorage(adapter, { endpointPropertyName: 'set via cs' })
 
     const initialized = cs(fakeConfig)
-    
+
     // @ts-ignore
     expect(typeof initialized?.collections?.[0]?.upload?.adminThumbnail).toBe('function')
   })
@@ -101,12 +101,12 @@ describe('main plugin', () => {
             // @ts-ignore
             upload: {
               adminThumbnail: () => 'set via collection'
-            },
-          },
+            }
+          }
         ]
       }
     )
-    
+
     // @ts-ignore
     expect(initialized?.collections?.[0]?.upload?.adminThumbnail()).toBe('set via collection')
   })

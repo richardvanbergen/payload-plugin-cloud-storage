@@ -12,7 +12,7 @@ export default class S3Adapter implements AdapterInterface {
   options: FileOptions
   getEndpointUrlRef: getEndpointUrl | undefined
 
-  constructor(s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions, getEndpoint?: getEndpointUrl) {
+  constructor (s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions, getEndpoint?: getEndpointUrl) {
     this.instance = new AWS.S3(s3Configuration)
     this.options = fileOptions
     if (getEndpoint) {
@@ -20,7 +20,7 @@ export default class S3Adapter implements AdapterInterface {
     }
   }
 
-  getEndpointUrl(filename: string) {
+  getEndpointUrl (filename: string) {
     if (this.getEndpointUrlRef) {
       return this.getEndpointUrlRef(this.options.endpointUrl, filename)
     }
@@ -28,20 +28,20 @@ export default class S3Adapter implements AdapterInterface {
     return `${this.options.endpointUrl}/${filename}`
   }
 
-  async upload(file: UploadedFile): Promise<void> {
+  async upload (file: UploadedFile): Promise<void> {
     await this.instance.putObject({
       Bucket: this.options.bucket,
       Key: file.name,
       Body: file.data,
       ACL: this.options.acl,
-      ContentType: file.mimetype,
+      ContentType: file.mimetype
     })
   }
 
-  async delete(filename: string): Promise<void> {
+  async delete (filename: string): Promise<void> {
     await this.instance.deleteObject({
       Bucket: process.env.SPACES_NAME,
-      Key: String(filename),
+      Key: String(filename)
     })
   }
 }

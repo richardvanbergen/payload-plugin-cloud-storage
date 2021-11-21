@@ -22,7 +22,6 @@ describe('readHook', () => {
       }
     })
 
-
     expect(result.testProperty).toBeUndefined()
   })
 
@@ -36,8 +35,7 @@ describe('readHook', () => {
       }
     })
 
-
-    expect(result.testProperty).toBe(`path/test.file`)
+    expect(result.testProperty).toBe('path/test.file')
   })
 
   it('can return endpoint for sizes', async () => {
@@ -55,8 +53,7 @@ describe('readHook', () => {
       }
     })
 
-
-    expect(result.testProperty).toBe(`path/test.file`)
-    expect(result.sizes.mobile.testProperty).toBe(`path/resized.file`)
+    expect(result.testProperty).toBe('path/test.file')
+    expect(result.sizes.mobile.testProperty).toBe('path/resized.file')
   })
 })

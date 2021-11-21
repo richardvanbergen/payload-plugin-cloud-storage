@@ -12,7 +12,6 @@ export type CloudStoragePluginOptions = {
   disableLocalStorage?: boolean
 }
 
-
 const cloudStorage = (
   adapter: AdapterInterface,
   options?: CloudStoragePluginOptions
@@ -47,11 +46,11 @@ const cloudStorage = (
             ...collection.hooks,
             beforeChange: [
               ...beforeChange,
-              uploadHook(adapter),
+              uploadHook(adapter)
             ],
             afterDelete: [
               ...afterDelete,
-              deleteHook(adapter),
+              deleteHook(adapter)
             ],
             afterRead: composedReadHooks
           }
@@ -64,7 +63,7 @@ const cloudStorage = (
         }
 
         return collection
-      }),
+      })
     }
 
     return config

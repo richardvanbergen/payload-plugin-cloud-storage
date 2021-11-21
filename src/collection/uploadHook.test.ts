@@ -42,7 +42,7 @@ describe('uploadHook', () => {
       files: {
         file: [
           testFile2,
-          testFile,
+          testFile
         ]
       }
     }
