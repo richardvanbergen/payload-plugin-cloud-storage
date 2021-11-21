@@ -10,15 +10,15 @@ describe('main plugin', () => {
   beforeEach(() => {
     adapter = mockInterface<AdapterInterface>()
     fakeConfig = {
+      serverURL: '',
       collections: [
-        // @ts-ignore
         {
           slug: 'image',
-          // @ts-ignore
+          fields: [],
           upload: {}
         },
-        // @ts-ignore
         {
+          fields: [],
           slug: 'image2'
         }
       ]
@@ -27,10 +27,8 @@ describe('main plugin', () => {
 
   it('returns config unaltered if no collections', () => {
     const cs = cloudStorage(adapter)
-    // @ts-ignore
-    const initialized = cs({})
+    const initialized = cs({ serverURL: '' })
 
-    // @ts-ignore
     expect(initialized?.collections?.[0]?.hooks?.beforeChange).toBeUndefined()
   })
 
@@ -52,13 +50,12 @@ describe('main plugin', () => {
 
   it('attaches hooks to upload collections where upload is not an object', () => {
     const cs = cloudStorage(adapter)
-    // @ts-ignore
     const initialized = cs({
+      serverURL: '',
       collections: [
-        // @ts-ignore
         {
           slug: 'image',
-          // @ts-ignore
+          fields: [],
           upload: true
         }
       ]
@@ -71,34 +68,32 @@ describe('main plugin', () => {
   it('can disable after endpoint properties', () => {
     const cs = cloudStorage(adapter, { disableEndpointProperty: true })
 
-    // @ts-ignore
     const initialized = cs(fakeConfig)
+    const upload = initialized?.collections?.[0]?.upload
 
     expect(initialized?.collections?.[0]?.hooks?.afterRead).toHaveLength(0)
-    // @ts-ignore
-    expect(initialized?.collections?.[0]?.upload?.adminThumbnail).toBe(undefined)
+    expect(typeof upload === 'boolean' ? false : upload?.adminThumbnail).toBe(undefined)
   })
 
   it('can set the admin thumbnail property', () => {
     const cs = cloudStorage(adapter, { endpointPropertyName: 'set via cs' })
 
     const initialized = cs(fakeConfig)
+    const upload = initialized?.collections?.[0]?.upload
 
-    // @ts-ignore
-    expect(typeof initialized?.collections?.[0]?.upload?.adminThumbnail).toBe('function')
+    expect(typeof upload === 'boolean' ? false : upload?.adminThumbnail).toBe('function')
   })
 
   it('does not override existing adminThumbnails', () => {
     const cs = cloudStorage(adapter, { endpointPropertyName: 'set via cs' })
 
     const initialized = cs(
-      // @ts-ignore
       {
+        serverURL: '',
         collections: [
-          // @ts-ignore
           {
             slug: 'image',
-            // @ts-ignore
+            fields: [],
             upload: {
               adminThumbnail: () => 'set via collection'
             }
@@ -107,7 +102,7 @@ describe('main plugin', () => {
       }
     )
 
-    // @ts-ignore
-    expect(initialized?.collections?.[0]?.upload?.adminThumbnail()).toBe('set via collection')
+    const upload = initialized?.collections?.[0]?.upload
+    expect(typeof upload === 'boolean' ? false : upload?.adminThumbnail).toBe('set via collection')
   })
 })

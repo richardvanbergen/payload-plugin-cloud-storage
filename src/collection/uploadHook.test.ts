@@ -23,7 +23,7 @@ describe('uploadHook', () => {
     }
 
     initializedHook({
-      // @ts-ignore
+      // @ts-expect-error no req mocking
       req
     })
 
@@ -48,7 +48,7 @@ describe('uploadHook', () => {
     }
 
     initializedHook({
-      // @ts-ignore
+      // @ts-expect-error no req mocking
       req
     })
 
@@ -76,7 +76,7 @@ describe('uploadHook', () => {
       }
     }
 
-    // @ts-ignore
+    // @ts-expect-error no req mocking
     initializedHook({ data, req })
 
     expect(adapter.upload).toBeCalledWith(testFile)
@@ -93,7 +93,7 @@ describe('uploadHook', () => {
     const req = {
     }
 
-    // @ts-ignore
+    // @ts-expect-error no req mocking
     initializedHook({ req })
 
     expect(adapter.upload).not.toBeCalled()

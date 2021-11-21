@@ -27,8 +27,10 @@ const uploadHook = (adapter: AdapterInterface) => {
                 mimetype: mimetype
               })
             }
+
+            return null
           })
-          .filter(buffer => typeof buffer !== 'undefined')
+          .filter(buffer => buffer !== null)
         : []
 
       await Promise.all([adapter.upload(uploadedFile), ...resizedBuffers])

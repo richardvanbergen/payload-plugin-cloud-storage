@@ -11,7 +11,7 @@ describe('deleteHook', () => {
 
   it('can make a hook that calls adapters delete method', () => {
     const initializedHook = deleteHook(adapter)
-    // @ts-ignore
+    // @ts-expect-error don't need whole object for this test
     initializedHook({ doc: { filename: 'test.jpg' } })
     expect(adapter.delete).toBeCalledTimes(1)
   })

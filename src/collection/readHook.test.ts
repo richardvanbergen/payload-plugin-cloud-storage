@@ -1,5 +1,5 @@
 import readHook from './readHook'
-import { AdapterInterface, UploadedFile } from '../adapter'
+import { AdapterInterface } from '../adapter'
 import { mock as mockInterface } from 'jest-mock-extended'
 
 describe('readHook', () => {
@@ -16,7 +16,7 @@ describe('readHook', () => {
   it('does not alter if filename missing', async () => {
     const initializedHook = readHook(adapter, 'testProperty')
 
-    // @ts-ignore
+    // @ts-expect-error don't need full def
     const result = await initializedHook({
       doc: {
       }
@@ -28,7 +28,7 @@ describe('readHook', () => {
   it('can add a property to main upload object', async () => {
     const initializedHook = readHook(adapter, 'testProperty')
 
-    // @ts-ignore
+    // @ts-expect-error don't need full def
     const result = await initializedHook({
       doc: {
         filename: 'test.file'
@@ -41,7 +41,7 @@ describe('readHook', () => {
   it('can return endpoint for sizes', async () => {
     const initializedHook = readHook(adapter, 'testProperty')
 
-    // @ts-ignore
+    // @ts-expect-error don't need full def
     const result = await initializedHook({
       doc: {
         filename: 'test.file',
