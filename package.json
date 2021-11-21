@@ -30,6 +30,14 @@
     "@types/express-fileupload": "^1.1.7",
     "@types/jest": "^26.0.24",
     "@types/sharp": "^0.28.5",
+    "@types/streamifier": "^0.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "eslint": "^8.2.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.1",
     "jest": "^27.0.6",
     "jest-mock-extended": "^1.0.18",
     "ts-jest": "^27.0.4",
@@ -37,6 +45,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.23.0",
-    "payload": "^0.12.3"
+    "cloudinary": "^1.27.1",
+    "payload": "^0.12.3",
+    "streamifier": "^0.1.1"
   }
 }
