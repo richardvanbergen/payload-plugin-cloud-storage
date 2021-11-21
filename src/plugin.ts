@@ -2,7 +2,7 @@ import { Config } from 'payload/config'
 import uploadHook from './collection/uploadHook'
 import deleteHook from './collection/deleteHook'
 import readHook from './collection/readHook'
-import { AdapterInterface } from './adapter'
+import type { AdapterInterface } from './adapter.d'
 import initAdminThumbnail from './collection/adminThumbnail'
 import shouldApplyAdminThumbnail from './validation/shouldApplyAdminThumbnail'
 
@@ -13,7 +13,7 @@ export type CloudStoragePluginOptions = {
 }
 
 const cloudStorage = (
-  adapter: AdapterInterface,
+  adapter: AdapterInterface<unknown, unknown>,
   options?: CloudStoragePluginOptions
 ) => {
   const endpointFieldName = options?.endpointPropertyName ?? 'cloudStorageUrl'

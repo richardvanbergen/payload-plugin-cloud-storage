@@ -1,14 +1,14 @@
 import cloudStorage from './plugin'
 import { mock as mockInterface } from 'jest-mock-extended'
-import { AdapterInterface } from './adapter'
+import type { AdapterInterface } from './adapter.d'
 import { Config } from 'payload/config'
 
 describe('main plugin', () => {
-  let adapter: AdapterInterface
+  let adapter: AdapterInterface<unknown, unknown>
   let fakeConfig: Config
 
   beforeEach(() => {
-    adapter = mockInterface<AdapterInterface>()
+    adapter = mockInterface<AdapterInterface<unknown, unknown>>()
     fakeConfig = {
       serverURL: '',
       collections: [
@@ -81,7 +81,7 @@ describe('main plugin', () => {
     const initialized = cs(fakeConfig)
     const upload = initialized?.collections?.[0]?.upload
 
-    expect(typeof upload === 'boolean' ? false : upload?.adminThumbnail).toBe('function')
+    expect(typeof upload === 'boolean' ? 'boolean' : typeof upload?.adminThumbnail).toBe('function')
   })
 
   it('does not override existing adminThumbnails', () => {
@@ -103,6 +103,7 @@ describe('main plugin', () => {
     )
 
     const upload = initialized?.collections?.[0]?.upload
-    expect(typeof upload === 'boolean' ? false : upload?.adminThumbnail).toBe('set via collection')
+
+    expect(typeof upload !== 'boolean' && typeof upload?.adminThumbnail === 'function' && upload?.adminThumbnail({ doc: {} })).toBe('set via collection')
   })
 })

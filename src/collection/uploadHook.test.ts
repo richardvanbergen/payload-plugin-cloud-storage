@@ -1,12 +1,12 @@
 import uploadHook from './uploadHook'
-import { AdapterInterface, UploadedFile } from '../adapter'
+import type { AdapterInterface, UploadedFile } from '../adapter.d'
 import { mock as mockInterface } from 'jest-mock-extended'
 
 describe('uploadHook', () => {
-  let adapter: AdapterInterface
+  let adapter: AdapterInterface<unknown, unknown>
 
   beforeEach(() => {
-    adapter = mockInterface<AdapterInterface>()
+    adapter = mockInterface<AdapterInterface<unknown, unknown>>()
   })
 
   const testFile = mockInterface<UploadedFile>({

@@ -1,12 +1,12 @@
 import readHook from './readHook'
-import { AdapterInterface } from '../adapter'
+import type { AdapterInterface } from '../adapter.d'
 import { mock as mockInterface } from 'jest-mock-extended'
 
 describe('readHook', () => {
-  let adapter: AdapterInterface
+  let adapter: AdapterInterface<unknown, unknown>
 
   beforeEach(() => {
-    adapter = mockInterface<AdapterInterface>({
+    adapter = mockInterface<AdapterInterface<unknown, unknown>>({
       getEndpointUrl: (filename: string): string => {
         return `path/${filename}`
       }

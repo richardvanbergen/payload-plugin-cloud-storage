@@ -1,8 +1,7 @@
-import { UploadedFile } from 'express-fileupload'
 import { CollectionBeforeChangeHook } from 'payload/types'
-import { AdapterInterface } from '../adapter'
+import type { AdapterInterface, UploadedFile } from '../adapter.d'
 
-const uploadHook = (adapter: AdapterInterface) => {
+const uploadHook = (adapter: AdapterInterface<unknown, unknown>) => {
   const beforeChange: CollectionBeforeChangeHook = async (args) => {
     const { req, data } = args
     if (req?.files?.file) {
