@@ -24,7 +24,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint --ext .js,.ts ./src"
   },
   "devDependencies": {
     "@types/express-fileupload": "^1.1.7",
@@ -41,7 +42,7 @@
     "jest": "^27.0.6",
     "jest-mock-extended": "^1.0.18",
     "ts-jest": "^27.0.4",
-    "typescript": "^4.3.5"
+    "typescript": "^4.5.2"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.23.0",
