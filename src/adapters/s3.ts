@@ -1,5 +1,5 @@
 import * as AWS from '@aws-sdk/client-s3'
-import { AdapterInterface, getEndpointUrl, UploadedFile } from '../adapter'
+import { AdapterInterface, UploadedFile, UploadMeta, UploadResponse } from '../adapter'
 
 export type FileOptions = {
   bucket: string
@@ -7,41 +7,41 @@ export type FileOptions = {
   acl?: 'private' | 'public-read'
 }
 
-export default class S3Adapter implements AdapterInterface<AWS.PutObjectCommandOutput, AWS.DeleteObjectCommandOutput> {
+export default class S3Adapter implements AdapterInterface {
   instance: AWS.S3
   options: FileOptions
-  getEndpointUrlRef: getEndpointUrl | undefined
 
-  constructor (s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions, getEndpoint?: getEndpointUrl) {
+  constructor (s3Configuration: AWS.S3ClientConfig, fileOptions: FileOptions) {
     this.instance = new AWS.S3(s3Configuration)
     this.options = fileOptions
-    if (getEndpoint) {
-      this.getEndpointUrlRef = getEndpoint
-    }
   }
 
-  getEndpointUrl (filename: string) {
-    if (this.getEndpointUrlRef) {
-      return this.getEndpointUrlRef(this.options.endpointUrl, filename)
-    }
-
-    return `${this.options.endpointUrl}/${filename}`
+  getEndpointUrl (uploadMeta: UploadMeta) {
+    return uploadMeta?.endpointUrl
   }
 
-  async upload (file: UploadedFile): Promise<AWS.PutObjectCommandOutput> {
-    return await this.instance.putObject({
+  async upload (file: UploadedFile, id?: string): Promise<UploadResponse> {
+    await this.instance.putObject({
       Bucket: this.options.bucket,
       Key: file.name,
       Body: file.data,
       ACL: this.options.acl,
       ContentType: file.mimetype
     })
+
+    return {
+      uploadId: id,
+      uploadMeta: {
+        awsKey: file.name,
+        endpointUrl: `${this.options.endpointUrl}`
+      }
+    }
   }
 
-  async delete (filename: string): Promise<AWS.DeleteObjectCommandOutput> {
-    return await this.instance.deleteObject({
+  async delete (uploadMeta: UploadMeta): Promise<void> {
+    await this.instance.deleteObject({
       Bucket: process.env.SPACES_NAME,
-      Key: String(filename)
+      Key: String(uploadMeta?.endpointUrl)
     })
   }
 }

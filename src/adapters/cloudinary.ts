@@ -1,8 +1,8 @@
-import { AdapterInterface, UploadedFile } from '../adapter'
+import { AdapterInterface, UploadedFile, UploadMeta, UploadResponse } from '../adapter'
 import { UploadApiErrorResponse, UploadApiOptions, UploadApiResponse, v2 as cloudinary } from 'cloudinary'
 import streamifier from 'streamifier'
 
-export default class CloudinaryAdapter implements AdapterInterface<UploadApiResponse, void> {
+export default class CloudinaryAdapter implements AdapterInterface {
   options: UploadApiOptions
 
   constructor (cloudName: string, apiKey: string, apiSecret: string, options: UploadApiOptions) {
@@ -16,12 +16,12 @@ export default class CloudinaryAdapter implements AdapterInterface<UploadApiResp
     this.options = options
   }
 
-  // getEndpointUrl (filename: string) {
-  //   return ''
-  // }
+  getEndpointUrl (uploadMeta: UploadMeta) {
+    return uploadMeta?.cloudinarySecureUrl
+  }
 
-  async upload (file: UploadedFile): Promise<UploadApiResponse> {
-    return new Promise<UploadApiResponse>((resolve, reject) => {
+  async upload (file: UploadedFile, uploadId?: string): Promise<UploadResponse> {
+    return new Promise<UploadResponse>((resolve, reject) => {
       streamifier.createReadStream(file.data)
         .pipe(cloudinary.uploader.upload_stream(
           this.options,
@@ -31,7 +31,13 @@ export default class CloudinaryAdapter implements AdapterInterface<UploadApiResp
             }
 
             if (callResult) {
-              return resolve(callResult)
+              return resolve({
+                uploadId,
+                uploadMeta: {
+                  cloudinarySecureUrl: callResult.secure_url,
+                  cloudinaryPublicId: callResult.public_id
+                }
+              })
             }
 
             throw new Error('Cloudinary API no response')
@@ -40,7 +46,11 @@ export default class CloudinaryAdapter implements AdapterInterface<UploadApiResp
     })
   }
 
-  // async delete (filename: string): Promise<void> {
-  //   cloudinary.uploader.destroy(public_id, options, callback)
-  // }
+  async delete (uploadMeta: UploadMeta): Promise<void> {
+    if (uploadMeta?.cloudinaryPublicId) {
+      await cloudinary.uploader.destroy(uploadMeta.cloudinaryPublicId)
+    }
+
+    throw new Error('Unable to delete image. Missing public ID.')
+  }
 }

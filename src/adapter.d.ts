@@ -6,8 +6,15 @@ export type UploadedFile = {
 
 export type getEndpointUrl = (endpointUrl: string, filename: string) => string
 
-export interface AdapterInterface<UploadResponse, DeleteResponse> {
-  upload(file: UploadedFile): Promise<UploadResponse>
-  delete(filename: string): Promise<DeleteResponse>
-  getEndpointUrl(filename: string): string
+export type UploadMeta = { [key: string]: string }
+
+export type UploadResponse = {
+  uploadId?: string,
+  uploadMeta: unknown
+}
+
+export interface AdapterInterface {
+  upload(file: UploadedFile, id?: string): Promise<UploadResponse>
+  delete(uploadMeta?: UploadMeta): Promise
+  getEndpointUrl(uploadMeta: UploadMeta): string
 }

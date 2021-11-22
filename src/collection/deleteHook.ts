@@ -1,7 +1,7 @@
 import { CollectionAfterDeleteHook } from 'payload/types'
 import type { AdapterInterface } from '../adapter.d'
 
-export const deleteHook = (adapter: AdapterInterface<unknown, unknown>) => {
+export const deleteHook = (adapter: AdapterInterface) => {
   const afterDelete: CollectionAfterDeleteHook = async (args) => {
     const { doc } = args
     await adapter.delete(doc.filename)

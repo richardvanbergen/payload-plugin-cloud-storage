@@ -3,10 +3,10 @@ import type { AdapterInterface, UploadedFile } from '../adapter.d'
 import { mock as mockInterface } from 'jest-mock-extended'
 
 describe('uploadHook', () => {
-  let adapter: AdapterInterface<unknown, unknown>
+  let adapter: AdapterInterface
 
   beforeEach(() => {
-    adapter = mockInterface<AdapterInterface<unknown, unknown>>()
+    adapter = mockInterface<AdapterInterface>()
   })
 
   const testFile = mockInterface<UploadedFile>({
@@ -15,7 +15,7 @@ describe('uploadHook', () => {
   })
 
   it('can make a hook that calls adapters upload method', () => {
-    const initializedHook = uploadHook(adapter)
+    const initializedHook = uploadHook(adapter, 'meta')
     const req = {
       files: {
         file: testFile
@@ -32,7 +32,7 @@ describe('uploadHook', () => {
   })
 
   it('can fetch first file from array of files', () => {
-    const initializedHook = uploadHook(adapter)
+    const initializedHook = uploadHook(adapter, 'meta')
 
     const testFile2 = mockInterface<UploadedFile>({
       name: 'test.image'
@@ -57,7 +57,7 @@ describe('uploadHook', () => {
   })
 
   it('can process req.payloadUploadSizes', () => {
-    const initializedHook = uploadHook(adapter)
+    const initializedHook = uploadHook(adapter, 'meta')
     const req = {
       files: {
         file: testFile
@@ -89,7 +89,7 @@ describe('uploadHook', () => {
   })
 
   it('does nothing if no uploaded file', () => {
-    const initializedHook = uploadHook(adapter)
+    const initializedHook = uploadHook(adapter, 'meta')
     const req = {
     }
 

@@ -3,10 +3,10 @@ import type { AdapterInterface } from '../adapter.d'
 import { mock as mockInterface } from 'jest-mock-extended'
 
 describe('deleteHook', () => {
-  let adapter: AdapterInterface<void, void>
+  let adapter: AdapterInterface
 
   beforeEach(() => {
-    adapter = mockInterface<AdapterInterface<void, void>>()
+    adapter = mockInterface<AdapterInterface>()
   })
 
   it('can make a hook that calls adapters delete method', () => {

@@ -9,14 +9,16 @@ import shouldApplyAdminThumbnail from './validation/shouldApplyAdminThumbnail'
 export type CloudStoragePluginOptions = {
   disableEndpointProperty?: boolean
   endpointPropertyName?: string
+  cloudMetadataPropertyName?: string
   disableLocalStorage?: boolean
 }
 
 const cloudStorage = (
-  adapter: AdapterInterface<unknown, unknown>,
+  adapter: AdapterInterface,
   options?: CloudStoragePluginOptions
 ) => {
   const endpointFieldName = options?.endpointPropertyName ?? 'cloudStorageUrl'
+  const cloudMetadataPropertyName = options?.cloudMetadataPropertyName ?? 'cloudMetadata'
   const disableLocalStorage = options?.disableLocalStorage ?? true
 
   return (incomingConfig: Config): Config => {
@@ -46,7 +48,7 @@ const cloudStorage = (
             ...collection.hooks,
             beforeChange: [
               ...beforeChange,
-              uploadHook(adapter)
+              uploadHook(adapter, cloudMetadataPropertyName)
             ],
             afterDelete: [
               ...afterDelete,
