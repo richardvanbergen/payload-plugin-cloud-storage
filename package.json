@@ -1,6 +1,6 @@
 {
   "name": "payload-plugin-cloud-storage",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Remote storage plugin for Payload CMS.",
   "main": "dist/index.js",
   "author": {
