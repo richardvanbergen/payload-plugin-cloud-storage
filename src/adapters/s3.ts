@@ -40,7 +40,7 @@ export default class S3Adapter implements AdapterInterface<AWS.PutObjectCommandO
 
   async delete (filename: string): Promise<AWS.DeleteObjectCommandOutput> {
     return await this.instance.deleteObject({
-      Bucket: process.env.SPACES_NAME,
+      Bucket: this.options.bucket,
       Key: String(filename)
     })
   }
